@@ -1,0 +1,31 @@
+version: '3.3'
+
+services:
+  uwsgi:
+    build:
+      context: ..
+      dockerfile: docker/uwsgi/Dockerfile
+    volumes:
+    - settings:/www/svh/svh/settings_local/
+    - media:/www/svh/media/
+    depends_on:
+    - postgres
+    links:
+    - postgres
+    restart: always
+    ports:
+    - 8000:8000
+
+  postgres:
+    build:
+      context: postgres
+      args: [MODULE]
+    environment: [MODULE]
+    volumes:
+    - db_data:/var/lib/postgresql/data/
+    restart: always
+
+volumes:
+  db_data: {}
+  media: {}
+  settings: {}
