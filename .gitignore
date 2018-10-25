@@ -105,3 +105,4 @@ venv.bak/
 
 .idea
 settings_local.py
+**/media

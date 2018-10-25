@@ -124,4 +124,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#SVH settings
+SOURCE_VIDEOS_PATH = '/www/svh/sources'
+
 from svh.settings_local import *
