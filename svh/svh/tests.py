@@ -1,9 +1,10 @@
 from django.test import TestCase
 
 
-class Benchmarks(TestCase): #  not run in ./manage.py test (because of naming), but can be run manually
+class Benchmarks(TestCase):  # not run in ./manage.py test (because of naming), but can be run manually
 
-     def bench_hash(self):
+    @property
+    def bench_hash(self):
         def hash_file(path):
             import hashlib
             BLOCKSIZE = 65536

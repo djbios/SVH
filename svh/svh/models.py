@@ -7,7 +7,7 @@ VIDEO_FORMATS = (
 class VideoSource(models.Model):
     path = models.CharField(max_length=200,  unique=True)
     hash = models.CharField(max_length=200, unique=True)
-
+    deleted = models.BooleanField(default=False)
     def __unicode__(self):
         return self.path
 
