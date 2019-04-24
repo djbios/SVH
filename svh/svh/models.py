@@ -15,7 +15,7 @@ class VideoSource(models.Model):
 class VideoFile(models.Model):
     path = models.CharField(max_length=200, unique=True)
     format = models.CharField(max_length=200, choices=VIDEO_FORMATS, default=VIDEO_FORMATS[0])
-    source = models.OneToOneField(VideoSource, on_delete=models.CASCADE)
+    source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
 
     def __unicode__(self):
         return self.source.path + self.format
