@@ -54,15 +54,6 @@ def folder_traverser():
 
         vf.save()
 
-    paths = [os.path.join(dp, f) for dp, dn, filenames in os.walk(settings.SOURCE_VIDEOS_PATH)
-             for f in filenames if
-             os.path.splitext(f)[1] == ".yaml"]
-    for root_path in paths:
-        root_yaml = yaml.load(open(root_path))
-        root = Root(path=root_path, type=root_yaml['type'])
-        root.description = root_yaml.get('description')
-        root.preview_path = root_yaml.get('preview_path')
-
 
 def check_deleted_videosources():
     for vs in VideoSource.objects.filter(deleted=False):
