@@ -1,6 +1,9 @@
+import os
+
+from django.conf import settings
 from twisted.internet import protocol, defer
 from crochet import setup
-from svh.models import VideoFile
+from svh.models import VideoFile, VideoFolder
 
 setup()
 
