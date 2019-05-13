@@ -6,11 +6,21 @@ VIDEO_FORMATS = (
     ('default', '-vcodec libx264'),
 )
 
+class VideoFolder(MPTTModel):
+    path = models.CharField(max_length=2000, unique=True)
+    type = models.CharField(max_length=200, null=True)
+    description = models.TextField(null=True)
+    preview_path = models.CharField(max_length=2000, null=True)
+    parent = TreeForeignKey('self',
+                            related_name='folder_parent',
+                            null=True, on_delete=models.DO_NOTHING)
+
 class VideoSource(models.Model):
     path = models.CharField(max_length=2000,  unique=True)
     hash = models.CharField(max_length=200, unique=True)
     sizeBytes = models.IntegerField(null=True)
     deleted = models.BooleanField(default=False)
+    folder = models.ForeignKey(VideoFolder,on_delete=models.SET_NULL, null=True)
     def __unicode__(self):
         return self.path
 
@@ -23,13 +33,3 @@ class VideoFile(models.Model):
 
     def __unicode__(self):
         return self.source.path + self.format
-
-
-class VideoFolder(MPTTModel):
-    path = models.CharField(max_length=2000, unique=True)
-    type = models.CharField(max_length=200, null=True)
-    description = models.TextField(null=True)
-    preview_path = models.CharField(max_length=2000, null=True)
-    parent = TreeForeignKey('self',
-                            related_name='folder_parent',
-                            null=True, on_delete=models.DO_NOTHING)

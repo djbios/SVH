@@ -13,28 +13,8 @@ VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'a
 
 def update_library():
     folder_traverser()
-    scan_new_videos()
     check_deleted_videosources()
     update_video_sizes()
-
-
-def scan_new_videos():
-    paths = [os.path.join(dp, f) for dp, dn, filenames in os.walk(settings.SOURCE_VIDEOS_PATH)
-              for f in filenames if
-              os.path.splitext(f)[1] in ['.%s' % ex for ex in VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]]
-    for path in paths:
-        hash = hashfile(path, hexdigest=True)
-        try:
-            obj = VideoSource.objects.get(hash=hash)
-            obj.path = path
-            obj.save()
-        except VideoSource.DoesNotExist:
-            vs = VideoSource(path=path, hash=hash)
-            vs.save()
-        print(path, hash)
-
-    return len(paths)
-
 
 def folder_traverser():
     folders = []
@@ -51,6 +31,19 @@ def folder_traverser():
             vf.type = root_yaml['type']
             vf.description = root_yaml.get('description')
             vf.preview_path = root_yaml.get('preview_path')
+        for f in files:
+            if os.path.splitext(f)[1] in ['.%s' % ex for ex in VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
+                filepath = os.path.join(path, f)
+                hash = hashfile(filepath, hexdigest=True)
+                try:
+                    obj = VideoSource.objects.get(hash=hash)
+                    obj.path = filepath
+                    obj.folder = vf
+                    obj.save()
+                except VideoSource.DoesNotExist:
+                    vs = VideoSource(path=filepath, hash=hash, folder=vf)
+                    vs.save()
+                print(filepath, hash)
 
         vf.save()
 
@@ -76,7 +69,7 @@ def convert_video_in_format(input_path, output_path, format='default'):
     cmd = "ffmpeg"
     if os.name == 'nt':
         cmd = "C:\\\\Windows\\ffmpeg.exe" #todo magic path
-    args = [cmd, "-i", input_path, VIDEO_FORMATS[format], "-y", output_path]
+    args = [cmd, "-i", input_path] + dict(VIDEO_FORMATS)[format].split()+ ["-y", output_path]
     pp = Protocol()
     reactor.spawnProcess(pp, cmd, args, {})
     return pp.deferred

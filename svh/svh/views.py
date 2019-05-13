@@ -1,24 +1,19 @@
-import os
-
 from django.conf import settings
-from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from django.template import loader, RequestContext
-from svh.models import  VideoFile
+from svh.models import VideoFile, VideoFolder
+
 
 def index(request):
-    root = 'D:\\\\'
-    paths = [os.path.join(dp, f) for dp, dn, filenames in os.walk(settings.SOURCE_VIDEOS_PATH) for f in filenames]
-    dct = {}
-    for item in paths:
-        p = dct
-        for x in item.split('\\'):
-            p = p.setdefault(x, {})
+    root = VideoFolder.objects.get(level=0)
+    return page_from(request, root.pk)
 
-
-    return render(request, 'svh/index.html', {'videos': VideoFile.objects.all()})
+def page_from(request, root):
+    root_folder = get_object_or_404(VideoFolder, pk=root)
+    children = root_folder.get_children()
+    videos_ids = root_folder.videosource_set.values_list('videofile', flat=True)
+    return render(request, 'svh/index.html', {'folders': children, 'videos_ids': videos_ids}) #todo preview
 
 def play_video(request, id):
     videofile = get_object_or_404(VideoFile,id=id)
 
-    return render(request,'svh/videoplayer.html',{'videopath': videofile.path})
+    return render(request,'svh/videoplayer.html',{'videopath': videofile.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)})

@@ -5,9 +5,16 @@
         <h1>Welcome to SVH main page!</h1>
         <h2>Videos:</h2>
     </div>
+    <h5>Folders:</h5>
     <div>
-        {% for video in videos %}
-            <a href="{% url 'play_video' video.id %}">{{ video.path }} </a><br>
+    {% for folder in folders %}
+        <a href="{% url 'page' folder.id %}">{{ folder.path }} </a><br>
+    {% endfor %}
+    </div>
+    <h5>Videos:</h5>
+    <div>
+        {% for video in videos_ids %}
+            <a href="{% url 'play_video' video %}">{{ video }} </a><br>
         {% endfor %}
     </div>
 {% endblock %}

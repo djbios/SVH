@@ -1,9 +1,9 @@
+from django.conf import settings
 from django.test import TestCase
 
 
 class Benchmarks(TestCase):  # not run in ./manage.py test (because of naming), but can be run manually
 
-    @property
     def bench_hash(self):
         def hash_file(path):
             import hashlib
@@ -18,17 +18,17 @@ class Benchmarks(TestCase):  # not run in ./manage.py test (because of naming), 
 
         import os, time
         from imohash import hashfile
-        GB = 1024 * 1024 * 1024  # 1GB
-        path = '/tmp/large_file'
+        GB = 5 * 1024 * 1024 * 1024  # 1GB
+        path = os.path.join(settings.MEDIA_ROOT,'test')
         with open(path, 'wb') as fout:
             fout.write(os.urandom(GB))
 
         start_time = time.time()
         hash_file(path)
-        time1 = time.time() - start_time
+        time_md5 = time.time() - start_time
 
         start_time = time.time()
         hashfile(path)
         time2 = time.time() - start_time
 
-        print(time1, time2)
+        print(time_md5, time2)
