@@ -1,7 +1,7 @@
 from django.conf import settings
 import os
 from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder
-from imohash import hashfile
+import imohash
 from svh.utils import Protocol
 from twisted.internet import reactor, defer
 from crochet import wait_for
@@ -17,9 +17,7 @@ def update_library():
     update_video_sizes()
 
 def folder_traverser():
-    folders = []
     for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH):
-        folders.append(path)
         vf = VideoFolder.objects.filter(path=path).first()
         if not vf:
             vf = VideoFolder(path=path)
@@ -31,10 +29,11 @@ def folder_traverser():
             vf.type = root_yaml['type']
             vf.description = root_yaml.get('description')
             vf.preview_path = root_yaml.get('preview_path')
+        vf.save()
         for f in files:
             if os.path.splitext(f)[1] in ['.%s' % ex for ex in VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
                 filepath = os.path.join(path, f)
-                hash = hashfile(filepath, hexdigest=True)
+                hash = imohash.hashfile(filepath, hexdigest=True)
                 try:
                     obj = VideoSource.objects.get(hash=hash)
                     obj.path = filepath
