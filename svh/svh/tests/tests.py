@@ -17,3 +17,4 @@ class CoreTests(TestCase):
         self.assertTrue(VideoFolder.objects.filter(path=os.path.join('/tmp/dir1')).count() == 1)
 
         oswalk.return_value = [('/tmp', ['dir1'], ['file1.avi']), ('/tmp/dir1', [], [])]
+    #todo more tests

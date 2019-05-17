@@ -11,9 +11,14 @@ def page_from(request, root):
     root_folder = get_object_or_404(VideoFolder, pk=root)
     children = root_folder.get_children()
     videos_ids = root_folder.videosource_set.values_list('videofile', flat=True)
-    return render(request, 'svh/index.html', {'folders': children, 'videos_ids': videos_ids}) #todo preview
+    return render(request, 'svh/index.html', {'folders': children, 'videos_ids': videos_ids}) #todo preview - from description.yaml or random video + for videos
+
 
 def play_video(request, id):
     videofile = get_object_or_404(VideoFile,id=id)
-
-    return render(request,'svh/videoplayer.html',{'videopath': videofile.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)})
+    neighbours = VideoFile.objects.filter(source__folder=videofile.source.folder)
+    return render(request,'svh/videoplayer.html',{
+        'videopath': videofile.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL),
+        'neighbours': neighbours,
+        'parent':videofile.source.folder
+    })

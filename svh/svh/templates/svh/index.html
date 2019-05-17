@@ -1,16 +1,15 @@
 {% extends "svh/base.html" %}
-{% block content %}
+{% block navigation %}
 
-    <div>
-        <h1>Welcome to SVH main page!</h1>
-        <h2>Videos:</h2>
-    </div>
+{% endblock %}
+{% block content %}
     <h5>Folders:</h5>
     <div>
-    {% for folder in folders %}
-        <a href="{% url 'page' folder.id %}">{{ folder.path }} </a><br>
-    {% endfor %}
+        {% for folder in folders %}
+            <a href="{% url 'page' folder.id %}">{{ folder.path }} </a><br>
+        {% endfor %}
     </div>
+
     <h5>Videos:</h5>
     <div>
         {% for video in videos_ids %}
