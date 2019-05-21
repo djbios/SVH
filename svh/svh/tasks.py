@@ -94,8 +94,6 @@ def generate_preview(videosource):
         pr.videosource = videosource
         pr.image.save(filename, io_buf)
 
-    pass
-
 @timeit
 def get_random_frames(video_path, count=1):
     cap = cv2.VideoCapture(video_path)

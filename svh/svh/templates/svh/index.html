@@ -12,8 +12,10 @@
 
     <h5>Videos:</h5>
     <div>
-        {% for video in videos_ids %}
-            <a href="{% url 'play_video' video %}">{{ video }} </a><br>
+        {% for video in videos %}
+                <img src="{{ video.preview }}"/> <br/>
+
+            <a href="{% url 'play_video' video.id %}">link</a><br>
         {% endfor %}
     </div>
 {% endblock %}
