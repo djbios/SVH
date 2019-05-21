@@ -2,7 +2,7 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from svh.models import VideoFile, VideoFolder
 
-
+#todo pass topfolders in context of all templates
 def index(request):
     root = VideoFolder.objects.get(level=0)
     return page_from(request, root.pk)

@@ -135,5 +135,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #SVH settings
 SOURCE_VIDEOS_PATH = '/www/svh/sources'
+PREVIEW_HEIGHT = 200
 
 from svh.settings_local import *

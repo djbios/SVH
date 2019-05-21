@@ -1,11 +1,15 @@
 from django.conf import settings
 import os
-from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder
+from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview
 import imohash
 from svh.utils import Protocol
 from twisted.internet import reactor, defer
 from crochet import wait_for
 import yaml
+import cv2
+import random
+from svh.utils import timeit
+import io
 
 VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi', 'mov', 'wmv', 'yuv', 'rm', 'mp4', 'm4p',
                     'mpg', 'mpeg', 'mp2', 'mpv', 'mpe', 'm4v', '3gp', 'mts']
@@ -15,7 +19,10 @@ def update_library():
     folder_traverser()
     check_deleted_videosources()
     update_video_sizes()
+    update_video_previews()
 
+
+@timeit
 def folder_traverser():
     for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH):
         vf = VideoFolder.objects.filter(path=path).first()
@@ -47,6 +54,7 @@ def folder_traverser():
         vf.save()
 
 
+@timeit
 def check_deleted_videosources():
     for vs in VideoSource.objects.filter(deleted=False):
         if not os.path.isfile(vs.path):
@@ -54,6 +62,7 @@ def check_deleted_videosources():
             print(vs.path,' was deleted.')
             vs.save()
 
+@timeit
 def update_video_sizes():
     for vs in VideoSource.objects.all():
         vs.sizeBytes = os.stat(vs.path).st_size
@@ -63,7 +72,47 @@ def update_video_sizes():
         vf.sizeBytes = os.stat(vf.path).st_size
         vf.save()
 
+@timeit
+def update_video_previews():
+    for vs in VideoSource.objects.all():
+        if not vs.preview_set.exists():
+            generate_preview(vs)
 
+@timeit
+def generate_preview(videosource):
+    smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
+    frames = get_random_frames(smallestVideofile.path, 20)
+    for i, f in enumerate(frames):
+        (h,w,s) = f.shape
+        scale = settings.PREVIEW_HEIGHT / h
+        nh, nw = h*scale, w*scale
+        f = cv2.resize(f, (int(nw), int(nh)))
+        is_success, buffer = cv2.imencode(".jpg", f)
+        io_buf = io.BytesIO(buffer)
+        filename = 'preview_%i_%i.jpg' % (videosource.pk, i) # todo replace with name after description adding
+        pr = Preview()
+        pr.videosource = videosource
+        pr.image.save(filename, io_buf)
+
+    pass
+
+@timeit
+def get_random_frames(video_path, count=1):
+    cap = cv2.VideoCapture(video_path)
+    video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+    targets = random.sample(range(min(video_length, 25*20)), count)
+    frames = []
+    if cap.isOpened() and video_length > 0:
+        i = 0
+        success, image = cap.read()
+        while success and i <= max(targets):
+            success, image = cap.read()
+            if i in targets:
+                frames.append(image)
+            i += 1
+    return frames
+
+@timeit
 def convert_video_in_format(input_path, output_path, format='default'):
     cmd = "ffmpeg"
     if os.name == 'nt':
@@ -73,7 +122,7 @@ def convert_video_in_format(input_path, output_path, format='default'):
     reactor.spawnProcess(pp, cmd, args, {})
     return pp.deferred
 
-
+@timeit
 @wait_for(timeout=3600)
 def convert_videos(format='default'):
     deferreds = []

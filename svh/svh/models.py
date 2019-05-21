@@ -7,6 +7,7 @@ VIDEO_FORMATS = (
 )
 
 class VideoFolder(MPTTModel):
+    name = models.CharField(max_length=500, null=True)
     path = models.CharField(max_length=2000, unique=True)
     type = models.CharField(max_length=200, null=True)
     description = models.TextField(null=True)
@@ -16,6 +17,7 @@ class VideoFolder(MPTTModel):
                             null=True, on_delete=models.DO_NOTHING)
 
 class VideoSource(models.Model):
+    name = models.CharField(max_length=500, null=True)
     path = models.CharField(max_length=2000,  unique=True)
     hash = models.CharField(max_length=200, unique=True)
     sizeBytes = models.IntegerField(null=True)
@@ -33,3 +35,8 @@ class VideoFile(models.Model):
 
     def __unicode__(self):
         return self.source.path + self.format
+
+class Preview(models.Model):
+    videosource = models.ForeignKey(VideoSource, on_delete=models.CASCADE)
+    pos_seconds = models.IntegerField(null=True)
+    image = models.ImageField(upload_to='previews')
