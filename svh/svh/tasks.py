@@ -25,18 +25,18 @@ def update_library():
 @timeit
 def folder_traverser():
     for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH):
-        vf = VideoFolder.objects.filter(path=path).first()
-        if not vf:
-            vf = VideoFolder(path=path)
+        folder = VideoFolder.objects.filter(path=path).first()
+        if not folder:
+            folder = VideoFolder(path=path)
             parent_path = os.path.abspath(os.path.join(path, os.pardir))
-            vf.parent = VideoFolder.objects.filter(path=parent_path).first()  # Get parent object or none
+            folder.parent = VideoFolder.objects.filter(path=parent_path).first()  # Get parent object or none
 
         if 'desc.yaml' in files:
-            root_yaml = yaml.load(open(os.path.join(path, 'desc.yaml')))
-            vf.type = root_yaml['type']
-            vf.description = root_yaml.get('description')
-            vf.preview_path = root_yaml.get('preview_path')
-        vf.save()
+            root_yaml = yaml.load(open(os.path.join(path, settings.DESCRIPTION_FILENAME)))
+            folder.type = root_yaml['type']
+            folder.description = root_yaml.get('description')
+            folder.preview_path = root_yaml.get('preview_path')
+        folder.save()
         for f in files:
             if os.path.splitext(f)[1] in ['.%s' % ex for ex in VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
                 filepath = os.path.join(path, f)
@@ -44,14 +44,14 @@ def folder_traverser():
                 try:
                     obj = VideoSource.objects.get(hash=hash)
                     obj.path = filepath
-                    obj.folder = vf
+                    obj.folder = folder
                     obj.save()
                 except VideoSource.DoesNotExist:
-                    vs = VideoSource(path=filepath, hash=hash, folder=vf)
+                    vs = VideoSource(path=filepath, hash=hash, folder=folder)
                     vs.save()
                 print(filepath, hash)
 
-        vf.save()
+        folder.save()
 
 
 @timeit
@@ -120,6 +120,8 @@ def convert_video_in_format(input_path, output_path, format='default'):
     reactor.spawnProcess(pp, cmd, args, {})
     return pp.deferred
 
+# todo threads limit
+#todo celery periodic
 @timeit
 @wait_for(timeout=3600)
 def convert_videos(format='default'):

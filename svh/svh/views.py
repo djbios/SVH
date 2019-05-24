@@ -2,10 +2,11 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from svh.models import VideoFile, VideoFolder
 
-#todo pass topfolders in context of all templates
+
 def index(request):
     root = VideoFolder.objects.get(level=0)
     return page_from(request, root.pk)
+
 
 def page_from(request, root):
     root_folder = get_object_or_404(VideoFolder, pk=root)
@@ -20,7 +21,7 @@ def page_from(request, root):
     return render(request, 'svh/index.html', {
         'folders': children,
         'videos': videos
-    },) #todo preview - from description.yaml or random video + for videos
+    }) #todo preview - from description.yaml or random video + for videos
 
 
 def play_video(request, id):

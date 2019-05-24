@@ -5,3 +5,6 @@ twisted
 crochet
 pillow
 opencv-python
+factory_boy
+django-mptt
+celery

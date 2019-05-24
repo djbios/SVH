@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'svh.utils.add_types_in_context'
             ],
         },
     },
@@ -136,5 +137,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #SVH settings
 SOURCE_VIDEOS_PATH = '/www/svh/sources'
 PREVIEW_HEIGHT = 200
-
+DESCRIPTION_FILENAME = 'description.yaml'
 from svh.settings_local import *

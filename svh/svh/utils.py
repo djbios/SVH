@@ -38,3 +38,8 @@ def timeit(method):
                 print(a)
         return result
     return timed
+
+def add_types_in_context(request):
+    alltypes = VideoFolder.objects.all_types()
+
+    return {'types': VideoFolder.objects.all_types()}
