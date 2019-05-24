@@ -31,9 +31,9 @@ def folder_traverser():
             parent_path = os.path.abspath(os.path.join(path, os.pardir))
             folder.parent = VideoFolder.objects.filter(path=parent_path).first()  # Get parent object or none
 
-        if 'desc.yaml' in files:
+        if settings.DESCRIPTION_FILENAME in files:
             root_yaml = yaml.load(open(os.path.join(path, settings.DESCRIPTION_FILENAME)))
-            folder.type = root_yaml['type']
+            folder.type = root_yaml.get('type')
             folder.description = root_yaml.get('description')
             folder.preview_path = root_yaml.get('preview_path')
         folder.save()

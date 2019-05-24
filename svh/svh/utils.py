@@ -17,6 +17,7 @@ class Protocol(protocol.ProcessProtocol):
     def processEnded(self, reason):
         self.deferred.callback({'code':reason.value.exitCode, 'logs':self.logs})
 
+
 #allows method(log_time = {})
 def timeit(method):
     def timed(*args, **kw):
@@ -35,6 +36,7 @@ def timeit(method):
                 print(a)
         return result
     return timed
+
 
 def add_types_in_context(request):
     return {'types': VideoFolder.objects.all_types()}
