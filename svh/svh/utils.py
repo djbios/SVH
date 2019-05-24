@@ -1,7 +1,4 @@
-import os
 import time
-
-from django.conf import settings
 from twisted.internet import protocol, defer
 from crochet import setup
 from svh.models import VideoFile, VideoFolder
@@ -40,6 +37,4 @@ def timeit(method):
     return timed
 
 def add_types_in_context(request):
-    alltypes = VideoFolder.objects.all_types()
-
     return {'types': VideoFolder.objects.all_types()}
