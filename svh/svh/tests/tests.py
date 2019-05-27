@@ -42,8 +42,17 @@ class CoreTests(TestCase):
         response = self.client.get(reverse('page',args=[vs.folder.id]))
         self.assertNotIn(vs.name, response.body)
 
+    def test_videofolder(self):
+        vf = VideoFolderFactory()
+        response = self.client.get(reverse('page', args=[vf.id]))
+        self.assertEqual(response.status_code, 200)
 
     def test_videofolder_without_files(self):
         vf = VideoFolderFactory()
         response = self.client.get('/')
         self.assertNotIn(vf.name, response.body)
+
+    def test_videofile(self):
+        vfile = VideoFileFactory()
+        response = self.client.get('play_video', args=[vfile.id])
+        self.assertEqual(response.status_code, 200)
