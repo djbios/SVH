@@ -122,6 +122,7 @@ def convert_video_in_format(input_path, output_path, format='default'):
 @timeit
 @wait_for(timeout=3600)
 def convert_videos(format='default'):
+    reactor.suggestThreadPoolSize(settings.MAX_THREADS_REACTOR)
     deferreds = []
     for source in VideoSource.objects.filter(deleted=False):
         if not source.videofile_set.filter(format=format).exists():
