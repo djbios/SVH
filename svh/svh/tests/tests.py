@@ -1,6 +1,6 @@
 from unittest.mock import patch
 from django.test import TestCase
-from svh.models import VideoFolder, VideoSource
+from django.urls import reverse
 from svh.tasks import folder_traverser
 from svh.tests.factories import *
 import os
@@ -34,3 +34,23 @@ class CoreTests(TestCase):
         for vf in VideoFolder.objects.all():
             self.assertEqual(1, list(types).count(vf.type))
 
+    def test_videosource_before_conversion(self):
+        vs = VideoSourceFactory()
+        self.client.get('/')
+        response = self.client.get(reverse('page',args=[vs.folder.id]))
+        self.assertNotIn(vs.name, response)
+
+    def test_videofolder(self):
+        vf = VideoFolderFactory()
+        response = self.client.get(reverse('page', args=[vf.id]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_videofolder_without_files(self):
+        vf = VideoFolderFactory()
+        response = self.client.get('/')
+        self.assertNotIn(vf.name, response)
+
+    def test_videofile(self):
+        vfile = VideoFileFactory()
+        response = self.client.get(reverse('play_video', args=[vfile.id]))
+        self.assertEqual(response.status_code, 200)

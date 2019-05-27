@@ -15,13 +15,6 @@ VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'a
                     'mpg', 'mpeg', 'mp2', 'mpv', 'mpe', 'm4v', '3gp', 'mts']
 
 
-def update_library():
-    folder_traverser()
-    check_deleted_videosources()
-    update_video_sizes()
-    update_video_previews()
-
-
 @timeit
 def folder_traverser():
     for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH):
@@ -31,9 +24,9 @@ def folder_traverser():
             parent_path = os.path.abspath(os.path.join(path, os.pardir))
             folder.parent = VideoFolder.objects.filter(path=parent_path).first()  # Get parent object or none
 
-        if 'desc.yaml' in files:
+        if settings.DESCRIPTION_FILENAME in files:
             root_yaml = yaml.load(open(os.path.join(path, settings.DESCRIPTION_FILENAME)))
-            folder.type = root_yaml['type']
+            folder.type = root_yaml.get('type')
             folder.description = root_yaml.get('description')
             folder.preview_path = root_yaml.get('preview_path')
         folder.save()
@@ -62,6 +55,7 @@ def check_deleted_videosources():
             print(vs.path,' was deleted.')
             vs.save()
 
+
 @timeit
 def update_video_sizes():
     for vs in VideoSource.objects.all():
@@ -72,11 +66,13 @@ def update_video_sizes():
         vf.sizeBytes = os.stat(vf.path).st_size
         vf.save()
 
+
 @timeit
 def update_video_previews():
     for vs in VideoSource.objects.all():
         if not vs.preview_set.exists():
             generate_preview(vs)
+
 
 @timeit
 def generate_preview(videosource):
@@ -91,10 +87,11 @@ def generate_preview(videosource):
         f = cv2.resize(f, (int(nw), int(nh)))
         is_success, buffer = cv2.imencode(".jpg", f)
         io_buf = io.BytesIO(buffer)
-        filename = 'preview_%i_%i.jpg' % (videosource.pk, i) # todo replace with name after description adding
+        filename = 'preview_%s_%i.jpg' % (videosource.name, i)
         pr = Preview()
         pr.videosource = videosource
         pr.image.save(filename, io_buf)
+
 
 @timeit
 def get_random_frames(video_path, count=1):
@@ -107,10 +104,12 @@ def get_random_frames(video_path, count=1):
         success, image = cap.read()
         while success and i <= max(targets):
             success, image = cap.read()
-            if i in targets:
+            if i in targets and cv2.countNonZero(image) > 30:
                 frames.append(image)
             i += 1
     return frames
+
+
 
 @timeit
 def convert_video_in_format(input_path, output_path, format='default'):
@@ -123,15 +122,16 @@ def convert_video_in_format(input_path, output_path, format='default'):
     return pp.deferred
 
 # todo threads limit
-#todo celery periodic
+# todo celery periodic
 @timeit
 @wait_for(timeout=36000)
 def convert_videos(format='default'):#todo use as is from sourse flag
+    s = defer.DeferredSemaphore(settings.MAX_THREADS_REACTOR)
     deferreds = []
-    for source in VideoSource.objects.filter(deleted=False)[:10]:
+    for source in VideoSource.objects.filter(deleted=False):
         if not source.videofile_set.filter(format=format).exists():
             target_path = os.path.join(settings.MEDIA_ROOT, '%s.mp4' % source.hash)
-            deferred = convert_video_in_format(source.path, target_path, format)
+            deferred = s.run(convert_video_in_format, source.path, target_path, format)
 
             def save_videofile(result, _source, _path):
                 if result.get('code') == 0:
@@ -143,5 +143,6 @@ def convert_videos(format='default'):#todo use as is from sourse flag
 
             deferred.addCallback(save_videofile, _source=source, _path=target_path)
             deferreds.append(deferred)
+
 
     return defer.DeferredList(deferreds)

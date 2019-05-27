@@ -17,8 +17,8 @@ class VideoFolder(MPTTModel):
     class Meta:
         ordering = ('path',)
     _name = models.CharField(max_length=500, null=True, db_column='name')
-    path = models.CharField(max_length=2000, unique=True) #todo add autofields by path
-    type = models.CharField(max_length=200, null=True) #todo add type manager (alltypes, vfs by type)
+    path = models.CharField(max_length=2000, unique=True)
+    type = models.CharField(max_length=200, null=True)
     description = models.TextField(null=True)
     preview_path = models.CharField(max_length=2000, null=True)
     parent = TreeForeignKey('self',
@@ -59,6 +59,9 @@ class VideoFile(models.Model):
 
     def __unicode__(self):
         return self.source.path + self.format
+
+    def preview(self):
+        Preview.objects.filter(videosource=self.source)
 
 
 class Preview(models.Model):
