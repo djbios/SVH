@@ -1,5 +1,5 @@
-import factory
-from svh.models import VideoFolder, VideoSource
+import factory.fuzzy
+from svh.models import VideoFolder, VideoSource, VideoFile, VIDEO_FORMATS
 
 
 class VideoFolderFactory(factory.DjangoModelFactory):
@@ -22,3 +22,12 @@ class VideoSourceFactory(factory.DjangoModelFactory):
     hash = factory.Faker('pystr')
     sizeBytes = factory.Faker('pyint')
     folder = factory.SubFactory(VideoFolderFactory)
+
+class VideoFileFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = VideoFile
+
+    path = factory.Faker('file_path')
+    sizeBytes = factory.Faker('pyint')
+    format = factory.fuzzy.FuzzyChoice(dict(VIDEO_FORMATS).keys())
+    source = factory.SubFactory(VideoSourceFactory)

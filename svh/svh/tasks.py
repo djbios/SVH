@@ -14,14 +14,6 @@ import io
 VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi', 'mov', 'wmv', 'yuv', 'rm', 'mp4', 'm4p',
                     'mpg', 'mpeg', 'mp2', 'mpv', 'mpe', 'm4v', '3gp', 'mts']
 
-
-def update_library():
-    folder_traverser()
-    check_deleted_videosources()
-    update_video_sizes()
-    update_video_previews()
-
-
 @timeit
 def folder_traverser():
     for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH):
@@ -62,6 +54,7 @@ def check_deleted_videosources():
             print(vs.path,' was deleted.')
             vs.save()
 
+
 @timeit
 def update_video_sizes():
     for vs in VideoSource.objects.all():
@@ -72,11 +65,13 @@ def update_video_sizes():
         vf.sizeBytes = os.stat(vf.path).st_size
         vf.save()
 
+
 @timeit
 def update_video_previews():
     for vs in VideoSource.objects.all():
         if not vs.preview_set.exists():
             generate_preview(vs)
+
 
 @timeit
 def generate_preview(videosource):
@@ -94,6 +89,7 @@ def generate_preview(videosource):
         pr.videosource = videosource
         pr.image.save(filename, io_buf)
 
+
 @timeit
 def get_random_frames(video_path, count=1):
     cap = cv2.VideoCapture(video_path)
@@ -105,10 +101,11 @@ def get_random_frames(video_path, count=1):
         success, image = cap.read()
         while success and i <= max(targets):
             success, image = cap.read()
-            if i in targets:
+            if i in targets and cv2.countNonZero(image) > 30:
                 frames.append(image)
             i += 1
     return frames
+
 
 @timeit
 def convert_video_in_format(input_path, output_path, format='default'):

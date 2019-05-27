@@ -32,3 +32,6 @@ def play_video(request, id):
         'neighbours': neighbours,
         'parent': videofile.source.folder,
     })
+
+def page_by_type(request, type):
+    pass #todo
