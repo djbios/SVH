@@ -81,6 +81,8 @@ def update_video_previews():
 @timeit
 def generate_preview(videosource):
     smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
+    if smallestVideofile == None:
+        return
     frames = get_random_frames(smallestVideofile.path, 20)
     for i, f in enumerate(frames):
         (h,w,s) = f.shape
@@ -123,10 +125,10 @@ def convert_video_in_format(input_path, output_path, format='default'):
 # todo threads limit
 #todo celery periodic
 @timeit
-@wait_for(timeout=3600)
-def convert_videos(format='default'):
+@wait_for(timeout=36000)
+def convert_videos(format='default'):#todo use as is from sourse flag
     deferreds = []
-    for source in VideoSource.objects.filter(deleted=False):
+    for source in VideoSource.objects.filter(deleted=False)[:10]:
         if not source.videofile_set.filter(format=format).exists():
             target_path = os.path.join(settings.MEDIA_ROOT, '%s.mp4' % source.hash)
             deferred = convert_video_in_format(source.path, target_path, format)
@@ -135,6 +137,7 @@ def convert_videos(format='default'):
                 if result.get('code') == 0:
                     vf = VideoFile(path = _path, format=format, source=_source)
                     vf.save()
+                    print("Converted successfully %s" % vf.path)
                 else:
                     print("Some shit happens in conversion! %s" % result.get('logs'))
 
