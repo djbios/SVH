@@ -84,7 +84,7 @@ def generate_preview(videosource):
         f = cv2.resize(f, (int(nw), int(nh)))
         is_success, buffer = cv2.imencode(".jpg", f)
         io_buf = io.BytesIO(buffer)
-        filename = 'preview_%i_%i.jpg' % (videosource.pk, i) # todo replace with name after description adding
+        filename = 'preview_%s_%i.jpg' % (videosource.name, i)
         pr = Preview()
         pr.videosource = videosource
         pr.image.save(filename, io_buf)
@@ -118,7 +118,7 @@ def convert_video_in_format(input_path, output_path, format='default'):
     return pp.deferred
 
 # todo threads limit
-#todo celery periodic
+# todo celery periodic
 @timeit
 @wait_for(timeout=3600)
 def convert_videos(format='default'):
