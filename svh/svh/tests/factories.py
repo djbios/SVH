@@ -12,7 +12,6 @@ class VideoFolderFactory(factory.DjangoModelFactory):
     description = factory.Faker('text')
     preview_path = factory.Faker('file_path')
 
-
 class VideoSourceFactory(factory.DjangoModelFactory):
     class Meta:
         model = VideoSource
