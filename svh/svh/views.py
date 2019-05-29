@@ -15,7 +15,7 @@ def page_from(request, root):
     videos_ids = [i for i in videos_ids if not i == None]
     videos = [{
         'id': v,
-        'preview': VideoFile.objects.get(pk=v).source.preview_set.order_by('pk').first().image.url
+        'preview': VideoFile.objects.get(pk=v).source.preview_set.order_by('pk').first() #todo refactor
     }
         for v in videos_ids]
 

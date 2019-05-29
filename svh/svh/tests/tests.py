@@ -24,8 +24,8 @@ class CoreTests(TestCase):
         self.assertIsNotNone(vf.name)
 
     def test_video_source_name_if_null(self):
-        vs = VideoSourceFactory(_name=None)
-        self.assertIsNotNone(vs.name)
+        vs = VideoSourceFactory(_name=None, path='some/test/path')
+        self.assertEqual(vs.name, 'path')
 
     def test_video_folder_types(self):
         vfs = VideoFolderFactory.create_batch(10)
@@ -53,4 +53,9 @@ class CoreTests(TestCase):
     def test_videofile(self):
         vfile = VideoFileFactory()
         response = self.client.get(reverse('play_video', args=[vfile.id]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_videofile_without_preview(self):
+        vfile = VideoFileFactory()
+        response = self.client.get(reverse('page', args=[vfile.source.folder.id]))
         self.assertEqual(response.status_code, 200)

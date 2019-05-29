@@ -79,7 +79,7 @@ def generate_preview(videosource):
     smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
     if smallestVideofile == None:
         return
-    frames = get_random_frames(smallestVideofile.path, 20)
+    frames = get_random_frames(smallestVideofile.path, 5)
     for i, f in enumerate(frames):
         (h,w,s) = f.shape
         scale = settings.PREVIEW_HEIGHT / h
@@ -94,18 +94,17 @@ def generate_preview(videosource):
 
 
 @timeit
-def get_random_frames(video_path, count=1):
+def get_random_frames(video_path, count=1):  # todo slow
     cap = cv2.VideoCapture(video_path)
     video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
-    targets = random.sample(range(min(video_length, 25*20)), count)
+    targets = random.sample(range(min(video_length, 25*10)), count)
     frames = []
     if cap.isOpened() and video_length > 0:
         i = 0
         success, image = cap.read()
         while success and i <= max(targets):
-            success, image = cap.read()
-            if i in targets and cv2.countNonZero(image) > 30:
-                frames.append(image)
+            success, image = cap.read() # todo it's black
+            frames.append(image)
             i += 1
     return frames
 

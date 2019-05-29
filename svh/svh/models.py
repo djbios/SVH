@@ -47,11 +47,11 @@ class VideoSource(models.Model):
     @property
     def name(self):
         if self._name == None:
-            return os.path.splitext(self.path)[0]
+            return os.path.basename(self.path)
         return self._name
 
 
-class VideoFile(models.Model):
+class VideoFile(models.Model): # todo delete file on model deletion
     path = models.CharField(max_length=2000, unique=True)
     sizeBytes = models.IntegerField(null=True)
     format = models.CharField(max_length=200, choices=VIDEO_FORMATS, default=VIDEO_FORMATS[0])
@@ -61,10 +61,12 @@ class VideoFile(models.Model):
         return self.source.path + self.format
 
     def preview(self):
-        Preview.objects.filter(videosource=self.source)
+        Preview.objects.filter(videosource=self.source).first()
 
 
-class Preview(models.Model):
+class Preview(models.Model): # todo delete file on model deletion
     videosource = models.ForeignKey(VideoSource, on_delete=models.CASCADE)
     pos_seconds = models.IntegerField(null=True)
     image = models.ImageField(upload_to='previews')
+
+#todo https://pypi.org/project/watchdog/ filesystem monitoring
