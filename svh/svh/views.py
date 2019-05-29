@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
-from svh.models import VideoFile, VideoFolder
+from svh.models import VideoFile, VideoFolder, VideoSource
 
 
 def index(request):
-    root = VideoFolder.objects.get(level=0)
+    root = VideoFolder.objects.filter(level=0).first()  # workaround just for tests, in real life there is only 1 root
     return page_from(request, root.pk)
 
 
@@ -34,5 +34,9 @@ def play_video(request, id):
         'parent': videofile.source.folder,
     })
 
+
 def page_by_type(request, type):
-    pass #todo
+    VideoFolder.objects.filter(type=type)
+    return render(request, 'svh/index.html',{
+        'folders': VideoFolder.objects.filter(type=type)
+    })

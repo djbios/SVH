@@ -59,3 +59,16 @@ class CoreTests(TestCase):
         vfile = VideoFileFactory()
         response = self.client.get(reverse('page', args=[vfile.source.folder.id]))
         self.assertEqual(response.status_code, 200)
+
+    def test_types_header(self):
+        vfs = VideoFolderFactory.create_batch(5)
+        response = self.client.get('/')
+        for vf in vfs:
+            self.assertIn(vf.type, response.content)
+
+    def test_page_by_type(self):
+        type='testtype'
+        vfs = [VideoFolderFactory(type=type) for vf in range(5)]
+        response = self.client.get(reverse('by_type', args=[type]))
+        for vf in vfs:
+            self.assertIn(vf.name, response)
