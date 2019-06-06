@@ -18,10 +18,10 @@ jobs:
       - run:
           command: |
             ls
-            sudo pip install -r requiremints.txt
+            sudo pip install -r ./svh/requiremints.txt
       - run:
           command: |
-            python manage.py test
+            python ./svh/manage.py test
       - store_test_results:
           path: test-results
       - store_artifacts:
