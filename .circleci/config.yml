@@ -17,7 +17,8 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages 
       - run:
           command: |
-            sudo pip install -r ./requiremints.txt
+            ls
+            sudo pip install -r requiremints.txt
       - run:
           command: |
             python manage.py test
