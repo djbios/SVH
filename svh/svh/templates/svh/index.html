@@ -6,15 +6,15 @@
     <h5>Folders:</h5>
     <div>
         {% for folder in folders %}
-            <a href="{% url 'page' folder.id %}">{{ folder.path }} </a><br>
+            <a href="{% url 'page' folder.id %}">{{ folder.name }} </a><br>
         {% endfor %}
     </div>
 
     <h5>Videos:</h5>
     <div>
         {% for video in videos %}
-                <img src="{{ video.preview.image.url }}"/> <br/>
-            <a href="{% url 'play_video' video.id %}">link</a><br>
+                <img src="{{ video.videofile.one_preview.image.url }}"/> <br/>
+            <a href="{% url 'play_video' video.id %}">{{  video.name }}</a><br>
         {% endfor %}
     </div>
 {% endblock %}

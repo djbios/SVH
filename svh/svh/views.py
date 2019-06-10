@@ -11,13 +11,7 @@ def index(request):
 def page_from(request, root):
     root_folder = get_object_or_404(VideoFolder, pk=root)
     children = root_folder.get_children()
-    videos_ids = root_folder.videosource_set.values_list('videofile', flat=True)
-    videos_ids = [i for i in videos_ids if not i == None]
-    videos = [{
-        'id': v,
-        'preview': VideoFile.objects.get(pk=v).source.preview_set.order_by('pk').first() #todo refactor
-    }
-        for v in videos_ids]
+    videos= root_folder.videosource_set.all()
 
     return render(request, 'svh/index.html', {
         'folders': children,
@@ -36,7 +30,7 @@ def play_video(request, id):
 
 
 def page_by_type(request, type):
-    VideoFolder.objects.filter(type=type)
+    folders = VideoFolder.objects.filter(type=type)
     return render(request, 'svh/index.html',{
-        'folders': VideoFolder.objects.filter(type=type)
+        'folders': folders,
     })

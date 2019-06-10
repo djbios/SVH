@@ -50,6 +50,10 @@ class VideoSource(models.Model):
             return os.path.basename(self.path)
         return self._name
 
+    @property
+    def videofile(self):
+        return self.videofile_set.first()
+
 
 class VideoFile(models.Model): # todo delete file on model deletion
     path = models.CharField(max_length=2000, unique=True)
@@ -60,8 +64,9 @@ class VideoFile(models.Model): # todo delete file on model deletion
     def __unicode__(self):
         return self.source.path + self.format
 
-    def preview(self):
-        Preview.objects.filter(videosource=self.source).first()
+    @property
+    def one_preview(self):
+        return self.source.preview_set.first()
 
 
 class Preview(models.Model): # todo delete file on model deletion

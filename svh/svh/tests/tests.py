@@ -64,11 +64,11 @@ class CoreTests(TestCase):
         vfs = VideoFolderFactory.create_batch(5)
         response = self.client.get('/')
         for vf in vfs:
-            self.assertIn(vf.type, response.content)
+            self.assertIn(vf.type, str(response.content))
 
     def test_page_by_type(self):
         type='testtype'
-        vfs = [VideoFolderFactory(type=type) for vf in range(5)]
+        vfs = [VideoFolderFactory(type=type) for i in range(5)]
         response = self.client.get(reverse('by_type', args=[type]))
         for vf in vfs:
-            self.assertIn(vf.name, response)
+            self.assertIn(vf.name, str(response.content))

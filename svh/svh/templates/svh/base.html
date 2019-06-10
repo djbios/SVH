@@ -25,7 +25,7 @@
         <ul class="navbar-nav">
             {% for t in types %}
                 <li class="nav-item">
-                    <a class="nav-link" href="">{{ t }}</a>
+                    <a class="nav-link" href="{% url 'by_type' t %}">{{ t }}</a>
                 </li>
             {% endfor %}
         </ul>
