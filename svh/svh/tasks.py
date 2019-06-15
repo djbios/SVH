@@ -1,6 +1,9 @@
 from django.conf import settings
 import os
-from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview
+
+from django.core.files.base import ContentFile
+
+from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview, Gif
 import imohash
 from svh.utils import Protocol
 from twisted.internet import reactor, defer
@@ -72,10 +75,26 @@ def update_video_previews():
     for vs in VideoSource.objects.all():
         if not vs.preview_set.exists():
             generate_preview(vs)
+        if not hasattr(vs, 'gif'):
+            generate_gif(vs)
 
 
 @timeit
 def generate_preview(videosource):
+    def get_random_frames(video_path, count=1):  # todo slow
+        cap = cv2.VideoCapture(video_path)
+        video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+        targets = random.sample(range(min(video_length, 25 * 10)), count)
+        frames = []
+        if cap.isOpened() and video_length > 0:
+            i = 0
+            success, image = cap.read()
+            while success and i <= max(targets):
+                success, image = cap.read()  # todo it's black
+                frames.append(image)
+                i += 1
+        return frames
+
     smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
     if smallestVideofile == None:
         return
@@ -92,24 +111,6 @@ def generate_preview(videosource):
         pr.videosource = videosource
         pr.image.save(filename, io_buf)
 
-
-@timeit
-def get_random_frames(video_path, count=1):  # todo slow
-    cap = cv2.VideoCapture(video_path)
-    video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
-    targets = random.sample(range(min(video_length, 25*10)), count)
-    frames = []
-    if cap.isOpened() and video_length > 0:
-        i = 0
-        success, image = cap.read()
-        while success and i <= max(targets):
-            success, image = cap.read() # todo it's black
-            frames.append(image)
-            i += 1
-    return frames
-
-
-
 @timeit
 def convert_video_in_format(input_path, output_path, format='default'):
     cmd = "ffmpeg"
@@ -120,7 +121,7 @@ def convert_video_in_format(input_path, output_path, format='default'):
     reactor.spawnProcess(pp, cmd, args, {})
     return pp.deferred
 
-# todo threads limit
+#todo watchdog
 # todo celery periodic
 @timeit
 @wait_for(timeout=36000)
@@ -145,3 +146,24 @@ def convert_videos(format='default'):#todo use as is from sourse flag
 
 
     return defer.DeferredList(deferreds)
+
+
+def generate_gif(videosource):
+    from moviepy.editor import VideoFileClip
+    smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
+    if smallestVideofile == None:
+        return
+    filename = '%s.gif' % videosource.id
+    clip = VideoFileClip(smallestVideofile.path)
+    scale = settings.PREVIEW_HEIGHT / clip.size[1]
+    clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(filename)
+    fh = open(filename, "rb")
+    if fh:
+        gif = Gif(videosource=videosource)
+        file_content = ContentFile(fh.read())
+        gif.image.save(filename, file_content)
+        gif.save()
+    fh.close()
+    if fh.closed:
+        os.remove(fh.name)
+        del fh
