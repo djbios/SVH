@@ -139,5 +139,6 @@ SOURCE_VIDEOS_PATH = '/www/svh/sources'
 PREVIEW_HEIGHT = 200
 DESCRIPTION_FILENAME = 'description.yaml'
 MAX_THREADS_REACTOR = 5
+AS_IS_BY_DEFAULT = True
 
 from svh.settings_local import *

@@ -15,6 +15,8 @@
             $('img.with-gif').hover(sourceSwap, sourceSwap);
         });
     </script>
+
+
     {% if parent %}
         <h4><a href="{% url 'page' parent.id %}">{{ parent.name }}</a></h4>
     {% endif %}
@@ -27,7 +29,7 @@
 
     <h5>Videos:</h5>
     <div>
-        {% for video in videos %}
+        {% for video in videosources %}
 {#                <img src="{{ video.videofile.one_preview.image.url }}"/> <br/>#}
             <img class="with-gif" data-alt-src="{{ video.gif.image.url }}" src="{{ video.videofile.one_preview.image.url }}"/> <br/>
             <a href="{% url 'play_video' video.id %}">{{  video.name }}</a><br>

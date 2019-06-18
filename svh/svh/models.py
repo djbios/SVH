@@ -1,3 +1,6 @@
+import subprocess
+
+from django.conf import settings
 from django.db import models
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
@@ -52,6 +55,11 @@ class VideoSource(models.Model):
 
     @property
     def videofile(self):
+        if settings.AS_IS_BY_DEFAULT and not self.videofile_set.exists():
+            linkpath = os.path.join(settings.MEDIA_ROOT, self.hash)
+            if not os.path.exists(linkpath):
+                os.symlink(self.path, linkpath)  # on windows needs Administrator
+            return VideoFile(path=linkpath,format='default',source=self)
         return self.videofile_set.first()
 
 class VideoFile(models.Model): # todo delete file on model deletion
@@ -66,6 +74,10 @@ class VideoFile(models.Model): # todo delete file on model deletion
     @property
     def one_preview(self):
         return self.source.preview_set.first()
+
+    @property
+    def url(self):
+        return self.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)
 
 
 class Preview(models.Model): # todo delete file on model deletion

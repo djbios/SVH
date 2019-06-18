@@ -16,18 +16,16 @@ def page_from(request, root):
     return render(request, 'svh/index.html', {
         'parent': root_folder.parent,
         'folders': children,
-        'videos': videos
+        'videosources': videos
     }) #todo preview - from description.yaml or random video + for videos
 
 
 def play_video(request, id, format='default'):
     videosource = get_object_or_404(VideoSource,id=id)
-    videofile = get_object_or_404(videosource.videofile_set, format=format)
-    neighbours = VideoFile.objects.filter(source__folder=videofile.source.folder)
+    neighbours = VideoSource.objects.filter(folder=videosource.folder)
     return render(request,'svh/videoplayer.html',{
-        'videopath': videofile.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL),
-        'neighbours': neighbours,
-        'parent': videofile.source.folder,
+        'videosource': videosource,
+        'videosurces_near': neighbours,
     })
 
 def page_by_type(request, type):
