@@ -20,20 +20,28 @@
     {% if parent %}
         <h4><a href="{% url 'page' parent.id %}">{{ parent.name }}</a></h4>
     {% endif %}
+
+
+    {% if folders %}
     <h5>Folders:</h5>
     <div>
         {% for folder in folders %}
+            <img src="{{ folder.first_video.videofile.one_preview.image.url }}" width="100px"/> <br/>
             <a href="{% url 'page' folder.id %}">{{ folder.name }} </a><br>
         {% endfor %}
     </div>
+    {% endif %}
 
-    <h5>Videos:</h5>
-    <div>
-        {% for video in videosources %}
-{#                <img src="{{ video.videofile.one_preview.image.url }}"/> <br/>#}
-            <img class="with-gif" data-alt-src="{{ video.gif.image.url }}" src="{{ video.videofile.one_preview.image.url }}"/> <br/>
-            <a href="{% url 'play_video' video.id %}">{{  video.name }}</a><br>
-        {% endfor %}
-    </div>
 
+    {% if videosources %}
+        <h5>Videos:</h5>
+        <ul class="list-group">
+                {% for video in videosources %}
+                     <li class="list-group-item">
+                    <img class="with-gif" data-alt-src="{{ video.gif.image.url }}" src="{{ video.videofile.one_preview.image.url }}"/> <br/>
+                    <a href="{% url 'play_video' video.id %}">{{  video.name }}</a><br>
+                     </li>
+                {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}

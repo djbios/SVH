@@ -35,6 +35,10 @@ class VideoFolder(MPTTModel):
             return os.path.splitext(self.path)[0]
         return self._name
 
+    @property
+    def first_video(self):
+        return self.videosource_set.first()
+
 
 class VideoSource(models.Model):
     _name = models.CharField(max_length=500, null=True, db_column='name')
@@ -50,7 +54,7 @@ class VideoSource(models.Model):
     @property
     def name(self):
         if self._name == None:
-            return os.path.basename(self.path)
+            return os.path.splitext(os.path.basename(self.path))[0]
         return self._name
 
     @property
