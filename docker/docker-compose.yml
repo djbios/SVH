@@ -1,12 +1,25 @@
 version: '3.3'
 
 services:
+  nginx:
+    build:
+      context: nginx
+    volumes:
+      - media:/www/svh/media/
+    links:
+      - uwsgi
+    depends_on:
+      - uwsgi
+    restart: always
+    ports:
+      - 80:80
+
   uwsgi:
     build:
-      context: ..
+      context: ../
       dockerfile: docker/uwsgi/Dockerfile
     volumes:
-    - settings:/www/svh/svh/settings_local/
+    - settings:/www/svh/settings_local/
     - media:/www/svh/media/
     - sources:/www/svh/sources
     depends_on:
@@ -15,7 +28,20 @@ services:
     - postgres
     restart: always
     ports:
-    - 8000:8000
+    - 127.0.0.1:9001:9000
+
+  celery:
+    build:
+      context: ..
+      dockerfile: docker/celery/Dockerfile
+    volumes:
+      - settings:/www/svh/svh/settings_local/
+      - media:/www/svh/media/
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    restart: always
 
   postgres:
     build:

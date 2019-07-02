@@ -29,10 +29,10 @@ def folder_traverser():
 
         if settings.DESCRIPTION_FILENAME in files:
             root_yaml = yaml.load(open(os.path.join(path, settings.DESCRIPTION_FILENAME)))
-            folder.type = root_yaml.get('type')
-            folder.description = root_yaml.get('description')
-            folder.preview_path = root_yaml.get('preview_path')
+            folder.fill(root_yaml)
+
         folder.save()
+
         for f in files:
             if os.path.splitext(f)[1] in ['.%s' % ex for ex in VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
                 filepath = os.path.join(path, f)
@@ -95,7 +95,7 @@ def generate_preview(videosource):
                 i += 1
         return frames
 
-    smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
+    smallestVideofile = videosource.videofile
     if smallestVideofile == None:
         return
     frames = get_random_frames(smallestVideofile.path, 5)
@@ -127,6 +127,8 @@ def convert_video_in_format(input_path, output_path, format='default'):
 @timeit
 @wait_for(timeout=36000)
 def convert_videos(format='default'):#todo use as is from sourse flag
+    if settings.AS_IS_BY_DEFAULT:
+        return
     s = defer.DeferredSemaphore(settings.MAX_THREADS_REACTOR)
     deferreds = []
     for source in VideoSource.objects.filter(deleted=False):
@@ -151,7 +153,7 @@ def convert_videos(format='default'):#todo use as is from sourse flag
 
 def generate_gif(videosource):
     from moviepy.editor import VideoFileClip
-    smallestVideofile = videosource.videofile_set.order_by('sizeBytes').first()
+    smallestVideofile = videosource.videofile
     if smallestVideofile == None:
         return
     filename = '%s.gif' % videosource.id

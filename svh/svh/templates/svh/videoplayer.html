@@ -3,7 +3,7 @@
     <h5>Parent <a href="{% url 'page' videosource.folder.id %}">{{ parent.path }} </a><br></h5>
     <h5>Neighbours:</h5>
     <div>
-        {% for video in videosurces_near %}
+        {% for video in videosources_near %}
             <a href="{% url 'play_video' video.id %}">{{ video }} </a><br>
         {% endfor %}
     </div>

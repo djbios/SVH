@@ -72,3 +72,14 @@ class CoreTests(TestCase):
         response = self.client.get(reverse('by_type', args=[type]))
         for vf in vfs:
             self.assertIn(vf.name, str(response.content))
+
+    def test_fill_attributes(self):
+        vf = VideoFolderFactory()
+        yaml = {
+            'description': 'some description',
+            'name': 'some name'
+        }
+        vf.fill(yaml)
+        self.assertEqual(yaml['description'], vf.description)
+        self.assertEqual(yaml['name'], vf._name)
+

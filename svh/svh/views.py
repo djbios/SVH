@@ -1,11 +1,11 @@
-from django.conf import settings
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from svh.models import VideoFile, VideoFolder, VideoSource
 
 
 def index(request):
-    root = VideoFolder.objects.filter(level=0).first()  # workaround just for tests, in real life there is only 1 root
+    root = get_list_or_404(VideoFolder, level=0)[0]  # workaround just for tests, in real life there is only 1 root
     return page_from(request, root.pk)
+
 
 
 def page_from(request, root):
@@ -25,7 +25,7 @@ def play_video(request, id, format='default'):
     neighbours = VideoSource.objects.filter(folder=videosource.folder)
     return render(request,'svh/videoplayer.html',{
         'videosource': videosource,
-        'videosurces_near': neighbours,
+        'videosources_near': neighbours,
     })
 
 def page_by_type(request, type):

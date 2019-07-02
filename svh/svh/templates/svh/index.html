@@ -26,8 +26,15 @@
     <h5>Folders:</h5>
     <div>
         {% for folder in folders %}
-            <img src="{{ folder.first_video.videofile.one_preview.image.url }}" width="100px"/> <br/>
-            <a href="{% url 'page' folder.id %}">{{ folder.name }} </a><br>
+            <a class="card-with-href" href="{% url 'page' folder.id %}">
+                <div class="card" style="width: 18rem;">
+                    <img alt="{{ folder.name }}" class="with-gif card-img-top" src="{{ folder.first_video.videofile.one_preview.image.url }}"/> <br/>
+                     <div class="card-body">
+                         <h5 class="card-title">{{ folder.name }}</h5>
+                         <p class="card-text">{{ folder.description }}</p>
+                     </div>
+                </div>
+            </a>
         {% endfor %}
     </div>
     {% endif %}
@@ -38,7 +45,7 @@
         <ul class="list-group">
                 {% for video in videosources %}
                      <li class="list-group-item">
-                    <img class="with-gif" data-alt-src="{{ video.gif.image.url }}" src="{{ video.videofile.one_preview.image.url }}"/> <br/>
+                    <img alt="{{ video.name }}" class="with-gif" data-alt-src="{{ video.gif.image.url }}" src="{{ video.videofile.one_preview.image.url }}"/> <br/>
                     <a href="{% url 'play_video' video.id %}">{{  video.name }}</a><br>
                      </li>
                 {% endfor %}

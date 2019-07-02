@@ -39,6 +39,12 @@ class VideoFolder(MPTTModel):
     def first_video(self):
         return self.videosource_set.first()
 
+    def fill(self, yaml_dict: dict):
+        self.description = yaml_dict.get('description')
+        self.preview_path = yaml_dict.get('preview_path')
+        self.type = yaml_dict.get('type')
+        self._name = yaml_dict.get('name')
+
 
 class VideoSource(models.Model):
     _name = models.CharField(max_length=500, null=True, db_column='name')
