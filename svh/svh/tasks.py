@@ -11,7 +11,7 @@ from crochet import wait_for
 import yaml
 import cv2
 import random
-from svh.utils import timeit
+from svh.utils import timeit, log_exception
 import io
 
 VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi', 'mov', 'wmv', 'yuv', 'rm', 'mp4', 'm4p',
@@ -151,6 +151,8 @@ def convert_videos(format='default'):#todo use as is from sourse flag
     return defer.DeferredList(deferreds)
 
 
+@log_exception
+@timeit
 def generate_gif(videosource):
     from moviepy.editor import VideoFileClip
     smallestVideofile = videosource.videofile

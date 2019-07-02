@@ -1,3 +1,7 @@
 a.card-with-href, a.card-with-href:hover {
     color: inherit;
 }
+.card{
+    margin-right: 10px;
+    margin-bottom: 10px;
+}

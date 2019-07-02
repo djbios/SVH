@@ -38,5 +38,15 @@ def timeit(method):
     return timed
 
 
+def log_exception(method):
+    def logged(*args, **kw):
+        try:
+            result = method(*args, **kw)
+            return result
+        except Exception as e:
+            print(e)
+
+    return logged
+
 def add_types_in_context(request):
     return {'types': VideoFolder.objects.all_types()}

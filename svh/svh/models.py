@@ -45,6 +45,11 @@ class VideoFolder(MPTTModel):
         self.type = yaml_dict.get('type')
         self._name = yaml_dict.get('name')
 
+    @property
+    def preview(self):
+        sources = self.videosource_set.exclude(preview=None)
+        return sources.first().preview if sources.exists() else None
+
 
 class VideoSource(models.Model):
     _name = models.CharField(max_length=500, null=True, db_column='name')
@@ -67,10 +72,14 @@ class VideoSource(models.Model):
     def videofile(self):
         if settings.AS_IS_BY_DEFAULT and not self.videofile_set.exists():
             linkpath = os.path.join(settings.MEDIA_ROOT, self.hash)
-            if not os.path.exists(linkpath):
+            if not os.path.lexists(linkpath):
                 os.symlink(self.path, linkpath)  # on windows needs Administrator
             return VideoFile(path=linkpath,format='default',source=self)
         return self.videofile_set.first()
+
+    @property
+    def preview(self):
+        return self.videofile.preview
 
 class VideoFile(models.Model): # todo delete file on model deletion
     path = models.CharField(max_length=2000, unique=True)
@@ -82,7 +91,7 @@ class VideoFile(models.Model): # todo delete file on model deletion
         return self.source.path + self.format
 
     @property
-    def one_preview(self):
+    def preview(self):
         return self.source.preview_set.first()
 
     @property
