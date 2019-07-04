@@ -21,7 +21,7 @@ services:
     volumes:
     - settings:/www/svh/settings_local/
     - media:/www/svh/media/
-    - sources:/www/svh/sources
+    - ../../videosources:/www/svh/sources
     depends_on:
     - postgres
     links:
@@ -46,8 +46,6 @@ services:
   postgres:
     build:
       context: postgres
-      args: [MODULE]
-    environment: [MODULE]
     volumes:
     - db_data:/var/lib/postgresql/data/
     restart: always
@@ -61,6 +59,15 @@ services:
     restart: always
     ports:
       - 127.0.0.1:5672:5672
+
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - ../../videosources:/home/svh/videosources
+    restart: always
+    ports:
+      - "2222:22"
+    command: svh:secretpassword:1001
 
 volumes:
   db_data: {}

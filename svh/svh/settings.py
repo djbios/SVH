@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '7iucc&h6dmmyne=7fih(*b-y(oy^x&+13nsv=10nz@hyp-2*_g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -79,8 +79,8 @@ WSGI_APPLICATION = 'svh.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'qw',
-        'USER': 'qw',
+        'NAME': 'svh_prod',
+        'USER': 'svh',
         'HOST': 'postgres',
     },
 }

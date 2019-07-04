@@ -1,4 +1,6 @@
 django
+uwsgi
+ipython
 psycopg2-binary
 imohash
 twisted
@@ -9,3 +11,4 @@ factory_boy
 django-mptt
 celery
 moviepy
+pyyaml
