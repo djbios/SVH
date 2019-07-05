@@ -19,7 +19,7 @@ services:
       context: ../
       dockerfile: docker/uwsgi/Dockerfile
     volumes:
-    - settings:/www/svh/settings_local/
+    - settings:/www/svh/svh/settings_local/
     - media:/www/svh/media/
     - ../../videosources:/www/svh/sources
     depends_on:

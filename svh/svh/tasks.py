@@ -78,7 +78,6 @@ def update_video_previews():
         if not hasattr(vs, 'gif'):
             generate_gif(vs)
 
-
 @timeit
 def generate_preview(videosource):
     def get_random_frames(video_path, count=1):  # todo slow

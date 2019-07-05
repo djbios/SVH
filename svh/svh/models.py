@@ -51,6 +51,11 @@ class VideoFolder(MPTTModel):
         return sources.first().preview if sources.exists() else None
 
 
+class VideoSourceManager(models.Manager):
+    def get_queryset(self):
+        return super(VideoSourceManager, self).get_queryset().exclude(deleted=True)
+
+
 class VideoSource(models.Model):
     _name = models.CharField(max_length=500, null=True, db_column='name')
     path = models.CharField(max_length=2000,  unique=True)
@@ -58,6 +63,7 @@ class VideoSource(models.Model):
     sizeBytes = models.IntegerField(null=True)
     deleted = models.BooleanField(default=False)
     folder = models.ForeignKey(VideoFolder,on_delete=models.SET_NULL, null=True)
+    objects = VideoSourceManager()
 
     def __unicode__(self):
         return self.path
