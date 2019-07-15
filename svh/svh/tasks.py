@@ -38,7 +38,8 @@ def folder_traverser():
                 filepath = os.path.join(path, f)
                 hash = imohash.hashfile(filepath, hexdigest=True)
                 try:
-                    obj = VideoSource.objects.get(hash=hash)
+                    obj = VideoSource.objects.get_with_deleted(hash=hash)
+                    obj.deleted = False
                     obj.path = filepath
                     obj.folder = folder
                     obj.save()
