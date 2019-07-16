@@ -11,11 +11,10 @@ RUN pip3 install -r requirements.txt --compile
 
 COPY svh /www/svh
 WORKDIR /www/svh
-RUN chown www-data:www-data -R /www/
 
 RUN mkdir /www/svh/svh/settings_local/ && \
     touch /www/svh/svh/settings_local/__init__.py && \
-    chown www-data:www-data -R /www/ && \
+    chown www-data:www-data -R /www && \
     dos2unix ./run.sh
 
 USER www-data

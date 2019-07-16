@@ -7,6 +7,7 @@ services:
     volumes:
       - media:/www/svh/media/
       - static:/www/svh/static
+      - sources:/www/svh/sources
     links:
       - uwsgi
     depends_on:
@@ -23,7 +24,7 @@ services:
     - settings:/www/svh/svh/settings_local/
     - media:/www/svh/media/
     - static:/www/svh/static
-    - ../../videosources:/www/svh/sources
+    - sources:/www/svh/sources
     depends_on:
     - postgres
     links:
@@ -74,7 +75,12 @@ services:
 volumes:
   db_data: {}
   media: {}
-  sources: {}
+  sources:
+    driver_opts:
+      type: none
+      device: "/home/djbios/videosources"
+      o: bind
+
   settings: {}
   rabbit: {}
   static: {}

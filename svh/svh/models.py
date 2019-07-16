@@ -80,10 +80,9 @@ class VideoSource(models.Model):
     @property
     def videofile(self):
         if settings.AS_IS_BY_DEFAULT and not self.videofile_set.exists():
-            linkpath = os.path.join(settings.MEDIA_ROOT, self.hash)
-            if not os.path.lexists(linkpath):
-                os.symlink(self.path, linkpath)  # on windows needs Administrator
-            return VideoFile(path=linkpath,format='default',source=self)
+            vf = VideoFile(path=self.path, format='default', source=self)
+            vf.is_fake = True
+            return vf
         return self.videofile_set.first()
 
     @property
@@ -95,6 +94,7 @@ class VideoFile(models.Model): # todo delete file on model deletion
     sizeBytes = models.IntegerField(null=True)
     format = models.CharField(max_length=200, choices=VIDEO_FORMATS, default=VIDEO_FORMATS[0])
     source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
+    is_fake = False
 
     def __unicode__(self):
         return self.source.path + self.format
@@ -105,6 +105,8 @@ class VideoFile(models.Model): # todo delete file on model deletion
 
     @property
     def url(self):
+        if self.is_fake:
+            return '/fake%s' % self.path
         return self.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)
 
 

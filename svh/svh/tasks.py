@@ -20,7 +20,7 @@ VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'a
 
 @timeit
 def folder_traverser():
-    for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH):
+    for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH, followlinks=True):
         folder = VideoFolder.objects.filter(path=path).first()
         if not folder:
             folder = VideoFolder(path=path)
@@ -90,8 +90,9 @@ def generate_preview(videosource):
             i = 0
             success, image = cap.read()
             while success and i <= max(targets):
-                success, image = cap.read()  # todo it's black
-                frames.append(image)
+                success, image = cap.read()  # todo black
+                if i in targets:
+                    frames.append(image)
                 i += 1
         return frames
 

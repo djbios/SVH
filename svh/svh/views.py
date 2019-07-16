@@ -1,9 +1,12 @@
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from svh.models import VideoFile, VideoFolder, VideoSource
 
 
 def index(request):
-    root = get_list_or_404(VideoFolder, level=0)[0]  # workaround just for tests, in real life there is only 1 root
+    root = VideoFolder.objects.filter(level=0).first()
+    if not root:
+        return HttpResponse("No video content")
     return page_from(request, root.pk)
 
 
