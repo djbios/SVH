@@ -1,5 +1,5 @@
 import subprocess
-
+from django.contrib import admin
 from django.conf import settings
 from django.db import models
 from mptt.fields import TreeForeignKey
@@ -54,6 +54,9 @@ class VideoFolder(MPTTModel):
 class VideoSourceManager(models.Manager):
     def get_queryset(self):
         return super(VideoSourceManager, self).get_queryset().exclude(deleted=True)
+
+    def get_with_deleted(self, **kwargs):
+        return super(VideoSourceManager, self).get_queryset().get(**kwargs)
 
 
 class VideoSource(models.Model):

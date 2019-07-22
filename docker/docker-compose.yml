@@ -6,6 +6,7 @@ services:
       context: nginx
     volumes:
       - media:/www/svh/media/
+      - static:/www/svh/static
     links:
       - uwsgi
     depends_on:
@@ -21,6 +22,7 @@ services:
     volumes:
     - settings:/www/svh/svh/settings_local/
     - media:/www/svh/media/
+    - static:/www/svh/static
     - ../../videosources:/www/svh/sources
     depends_on:
     - postgres
@@ -75,4 +77,4 @@ volumes:
   sources: {}
   settings: {}
   rabbit: {}
-
+  static: {}

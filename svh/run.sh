@@ -2,6 +2,7 @@
 
 trap 'exit' ERR
 python manage.py migrate --fake-initial --noinput
+python manage.py collectstatic --noinput
 
 exec /usr/local/bin/uwsgi \
     --socket=uwsgi:9000 \
