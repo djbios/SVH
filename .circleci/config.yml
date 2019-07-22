@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/SVH/svh/svh
+    working_directory: ~/SVH/svh/svh/svh
     docker:
       - image: circleci/python:3.6.4
         environment:
