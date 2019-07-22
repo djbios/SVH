@@ -25,7 +25,7 @@ jobs:
             sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
       - run:
           command: |
-            python ./svh/manage.py test
+            python3 ./svh/manage.py test ./svh
       - store_test_results:
           path: test-results
       - store_artifacts:
