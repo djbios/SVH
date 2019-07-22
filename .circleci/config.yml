@@ -21,6 +21,8 @@ jobs:
           command: |
             sudo pip install pipenv
             pipenv install -r ./svh/requirements.txt
+            cat ./svh/requirements.txt
+            ls ./svh
       - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
           key: deps9-{{ .Branch }}-{{ checksum "./svh/requirements.txt" }}
           paths:
