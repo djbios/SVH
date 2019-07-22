@@ -1,4 +1,7 @@
 # SVH
+[![CircleCI](https://circleci.com/gh/djbios/SVH/tree/master.svg?style=svg)](https://circleci.com/gh/djbios/SVH/tree/master)
+
+
 Simple Video Hosting
 
 
