@@ -20,6 +20,8 @@ jobs:
             sudo pip install -r ./svh/requirements.txt
       - run:
           command: |
+            mkdir ./svh/settings_local/
+            touch ./svh/settings_local/__init__.py
             python ./svh/manage.py test
       - store_test_results:
           path: test-results
