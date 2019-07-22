@@ -52,7 +52,7 @@ class CoreTests(TestCase):
 
     def test_videofile(self):
         vfile = VideoFileFactory()
-        response = self.client.get(reverse('play_video', args=[vfile.id]))
+        response = self.client.get(reverse('play_video', args=[vfile.source.id]))
         self.assertEqual(response.status_code, 200)
 
     def test_videofile_without_preview(self):

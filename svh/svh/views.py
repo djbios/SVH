@@ -21,7 +21,7 @@ def page_from(request, root):
 
 
 def play_video(request, id, format='default'):
-    videosource = get_object_or_404(VideoSource,id=id)
+    videosource = get_object_or_404(VideoSource, id=id)
     neighbours = VideoSource.objects.filter(folder=videosource.folder)
     return render(request,'svh/videoplayer.html',{
         'videosource': videosource,
