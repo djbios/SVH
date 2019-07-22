@@ -23,6 +23,8 @@ jobs:
             mkdir ./svh/svh/settings_local/
             touch ./svh/svh/settings_local/__init__.py
             sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
+      - run:
+          command: |
             python ./svh/manage.py test
       - store_test_results:
           path: test-results
