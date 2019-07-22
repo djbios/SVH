@@ -17,8 +17,7 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages 
       - run:
           command: |
-            ls
-            sudo pip install -r ./svh/requiremints.txt
+            sudo pip install -r ./svh/requirements.txt
       - run:
           command: |
             python ./svh/manage.py test
