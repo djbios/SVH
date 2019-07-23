@@ -16,25 +16,25 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - restore_cache:  # ensure this step occurs *before* installing dependencies
-          key: deps9-{{ .Branch }}-{{ checksum "./requirements.txt" }}
+          key: deps9-{{ .Branch }}-{{ checksum "./svh/requirements.txt" }}
       - run:
           command: |
             sudo pip install pipenv
-            pipenv install -r ./requirements.txt
+            pipenv install -r ./svh/requirements.txt
       - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
-          key: deps9-{{ .Branch }}-{{ checksum "./requirements.txt" }}
+          key: deps9-{{ .Branch }}-{{ checksum "./svh/requirements.txt" }}
           paths:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            mkdir ./svh/settings_local/
-            touch ./svh/settings_local/__init__.py
-            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/settings.py
+            mkdir ./svh/svh/settings_local/
+            touch ./svh/svh/settings_local/__init__.py
+            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
       - run:
           command: |
-            pipenv run python ./manage.py test
+            pipenv run python ./svh/manage.py test ./svh
       - store_test_results:
           path: test-results
       - store_artifacts:
