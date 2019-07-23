@@ -47,7 +47,7 @@ workflows:
       - hold:
           type: approval
           requires:
-            - dark-deploy
+            - build
           filters:
             branches:
               only: master
