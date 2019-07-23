@@ -35,6 +35,7 @@ jobs:
     machine:
       enabled: true
     steps:
+      - add_ssh_keys
       - run:
           command: |
             ssh $SSH_USER@$SSH_HOST "cd ./SVH && git checkout $CIRCLE_SHA1 && ./docker/deploy.sh"
@@ -53,7 +54,7 @@ workflows:
               only: master
       - deploy:
           requires:
-            - build
+            - hold
           filters:
             branches:
               only: master
