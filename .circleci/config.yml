@@ -26,11 +26,6 @@ jobs:
       - run:
           command: |
             python ./svh/manage.py test ./svh
-      - store_test_results:
-          path: test-results
-      - store_artifacts:
-          path: test-results
-          destination: tr1
   deploy:
     machine:
       enabled: true
@@ -38,7 +33,7 @@ jobs:
       - add_ssh_keys
       - run:
           command: |
-            ssh $SSH_USER@$SSH_HOST "cd ./SVH && git checkout $CIRCLE_SHA1 && ./docker/deploy.sh"
+            ssh $SSH_USER@$SSH_HOST "cd ./SVH && git pull && git checkout -f $CIRCLE_SHA1 && ./docker/deploy.sh"
 
 workflows:
   version: 2
