@@ -1,6 +1,8 @@
 # SVH
-[![CircleCI](https://circleci.com/gh/djbios/SVH/tree/master.svg?style=svg)](https://circleci.com/gh/djbios/SVH/tree/master)
+## CI/CD
+Master: [![CircleCI](https://circleci.com/gh/djbios/SVH/tree/master.svg?style=svg)](https://circleci.com/gh/djbios/SVH/tree/master)
 
+Develop: [![CircleCI](https://circleci.com/gh/djbios/SVH/tree/develop.svg?style=svg)](https://circleci.com/gh/djbios/SVH/tree/develop)
 
 Simple Video Hosting
 
