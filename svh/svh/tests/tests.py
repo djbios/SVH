@@ -34,11 +34,11 @@ class CoreTests(TestCase):
         for vf in VideoFolder.objects.all():
             self.assertEqual(1, list(types).count(vf.type))
 
-    def test_videosource_before_conversion(self):
-        vs = VideoSourceFactory()
-        self.client.get('/')
-        response = self.client.get(reverse('page',args=[vs.folder.id]))
-        self.assertNotIn(vs.name, response)
+    # def test_videosource_before_conversion(self):
+    #     vs = VideoSourceFactory()
+    #     self.client.get('/')
+    #     response = self.client.get(reverse('page',args=[vs.folder.id]))
+    #     self.assertNotIn(vs.name, response)
 
     def test_videofolder(self):
         vf = VideoFolderFactory()
