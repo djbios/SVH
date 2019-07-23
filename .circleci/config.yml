@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/SVH/svh/svh/svh/svh
+    working_directory: ~/SVH
     docker:
       - image: circleci/python:3.6.4
         environment:
@@ -31,7 +31,7 @@ jobs:
           command: |
             mkdir ./svh/settings_local/
             touch ./svh/settings_local/__init__.py
-            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
+            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/settings.py
       - run:
           command: |
             pipenv run python ./manage.py test
