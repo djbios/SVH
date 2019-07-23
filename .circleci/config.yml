@@ -38,3 +38,22 @@ jobs:
       - run:
           command: |
             ssh $SSH_USER@$SSH_HOST "cd ./SVH && git checkout $CIRCLE_SHA1 && ./docker/deploy.sh"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - hold:
+          type: approval
+          requires:
+            - dark-deploy
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
