@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/SVH/svh
+    working_directory: ~/SVH
     docker:
       - image: circleci/python:3.6.4
         environment:
@@ -9,21 +9,47 @@ jobs:
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
       - image: circleci/postgres:9.6.2
         environment:
-          POSTGRES_USER: root
-          POSTGRES_DB: circle_test
+          POSTGRES_USER: svh
+          POSTGRES_DB: svh_prod
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages 
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           command: |
-            ls
-            sudo pip install -r ./svh/requiremints.txt
+            sudo pip install -r ./svh/requirements.txt
       - run:
           command: |
-            python ./svh/manage.py test
-      - store_test_results:
-          path: test-results
-      - store_artifacts:
-          path: test-results
-          destination: tr1
+            mkdir ./svh/svh/settings_local/
+            touch ./svh/svh/settings_local/__init__.py
+            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
+      - run:
+          command: |
+            python ./svh/manage.py test ./svh
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - add_ssh_keys
+      - run:
+          command: |
+            ssh $SSH_USER@$SSH_HOST "cd ./SVH && git pull origin master && git checkout -f $CIRCLE_SHA1 && ./docker/deploy.sh"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - hold:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - hold
+          filters:
+            branches:
+              only: master
