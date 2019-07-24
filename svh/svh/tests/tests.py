@@ -7,6 +7,10 @@ import os
 
 
 class CoreTests(TestCase):
+    def test_empty_homepage(self):
+        resp = self.client.get('/')
+        self.assertEqual(resp.status_code, 200)
+
     @patch('os.walk')
     @patch('imohash.hashfile')
     def test_traverser(self, hashfile, oswalk):

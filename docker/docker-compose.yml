@@ -76,11 +76,6 @@ services:
 volumes:
   db_data: {}
   media: {}
-  sources_host:
-    driver_opts:
-      type: none
-      device: "/www/svh/videosources"
-      o: bind
   sources: {}
   settings: {}
   rabbit: {}
