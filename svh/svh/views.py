@@ -1,6 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, get_list_or_404
+
+from svh.forms import AddFolderForm
 from svh.models import VideoFile, VideoFolder, VideoSource
+from svh.tasks import download_torrent
 
 
 def index(request):
@@ -13,13 +16,21 @@ def index(request):
 
 def page_from(request, root):
     root_folder = get_object_or_404(VideoFolder, pk=root)
+    if request.method == "POST":
+        add_folder_form = AddFolderForm(request.POST) # todo validation
+        if (add_folder_form.is_valid()):
+            download_torrent(add_folder_form['magnet'].value(), root_folder.path)
+    else:
+        add_folder_form = AddFolderForm()
+
     children = root_folder.get_children()
     videos= root_folder.videosource_set.all()
 
     return render(request, 'svh/index.html', {
         'parent': root_folder.parent,
         'folders': children,
-        'videosources': videos
+        'videosources': videos,
+        'add_folder_form': add_folder_form
     }) #todo preview - from description.yaml or random video + for videos
 
 

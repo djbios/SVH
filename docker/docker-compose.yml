@@ -1,6 +1,8 @@
 version: '3.3'
 
 services:
+
+# Proxypass nginx server
   nginx:
     build:
       context: nginx
@@ -16,6 +18,8 @@ services:
     ports:
       - 80:80
 
+
+# Python web server
   uwsgi:
     build:
       context: ../
@@ -33,6 +37,8 @@ services:
     ports:
     - 127.0.0.1:9001:9000
 
+
+# Celery for long running background tasks
   celery:
     build:
       context: ..
@@ -46,6 +52,8 @@ services:
       - postgres
     restart: always
 
+
+# PostgreSQL database
   postgres:
     build:
       context: postgres
@@ -55,6 +63,7 @@ services:
     ports:
       - 127.0.0.1:5432:5432
 
+# RabbitMQ for celery
   rabbit:
     image: rabbitmq
     volumes:
@@ -63,24 +72,16 @@ services:
     ports:
       - 127.0.0.1:5672:5672
 
-  sftp:
-    image: atmoz/sftp
-    volumes:
-      - ../../videosources:/home/svh/videosources
-    restart: always
-    ports:
-      - "2222:22"
-    command: svh:secretpassword:1001
 
 volumes:
   db_data: {}
   media: {}
-  sources:
+  sources_host:
     driver_opts:
       type: none
       device: "/home/djbios/videosources"
       o: bind
-
+  sources: {}
   settings: {}
   rabbit: {}
   static: {}

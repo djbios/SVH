@@ -163,7 +163,7 @@ def generate_gif(videosource):
     clip = VideoFileClip(smallestVideofile.path)
     scale = settings.PREVIEW_HEIGHT / clip.size[1]
     clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(filename)
-    fh = open(filename, "rb")
+    fh = open(filename, "rb")  # todo local save
     if fh:
         gif = Gif(videosource=videosource)
         file_content = ContentFile(fh.read())
@@ -173,3 +173,6 @@ def generate_gif(videosource):
     if fh.closed:
         os.remove(fh.name)
         del fh
+
+def download_torrent(magnet, target_path):
+    pass

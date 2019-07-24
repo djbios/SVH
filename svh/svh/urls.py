@@ -2,9 +2,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from svh.views import index, play_video, page_from, page_by_type
-from adminsite.views import settings as admin_settings
 urlpatterns = [
-    url(r'^admin/settings', admin_settings),
     url(r'^admin/', admin.site.urls),
     url(r'^$', index),
     url(r'^videos/(\d+)/$', play_video, name='play_video'),

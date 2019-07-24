@@ -5,10 +5,10 @@
 {% block content %}
     <script>
         var sourceSwap = function () {
-        var $this = $(this);
-        var newSource = $this.data('alt-src');
-        $this.data('alt-src', $this.attr('src'));
-        $this.attr('src', newSource);
+            var $this = $(this);
+            var newSource = $this.data('alt-src');
+            $this.data('alt-src', $this.attr('src'));
+            $this.attr('src', newSource);
         };
 
         $(function () {
@@ -23,36 +23,69 @@
 
 
     {% if folders %}
-    <div>
-        {% for folder in folders %}
-            {% if forloop.first %}<div class="row">{% endif %}
+        <div>
+            {% if user.is_staff %}
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Download
+                    torrent here
+                </button>
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form method="POST" >
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Download torrent</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {{ add_folder_form.as_p }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% for folder in folders %}
+                {% if forloop.first %}
+                    <div class="row">{% endif %}
             <div class="col-xs-4">
                 <a class="card-with-href" href="{% url 'page' folder.id %}">
                     <div class="card" style="width: 18rem;">
-                        <img alt="{{ folder.name }}" class="with-gif card-img-top" src="{{ folder.preview.image.url }}"/> <br/>
-                         <div class="card-body">
-                             <h5 class="card-title">{{ folder.name }}</h5>
-                             <p class="card-text">{{ folder.description }}</p>
-                         </div>
+                        <img alt="{{ folder.name }}" class="with-gif card-img-top"
+                             src="{{ folder.preview.image.url }}"/> <br/>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ folder.name }}</h5>
+                            <p class="card-text">{{ folder.description }}</p>
+                        </div>
                     </div>
                 </a>
             </div>
-            {% if forloop.counter|divisibleby:3 %}</div><div class="row">{% endif %}
+            {% if forloop.counter|divisibleby:3 %}</div>
+                <div class="row">{% endif %}
             {% if forloop.last %}</div>{% endif %}
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
     {% endif %}
 
 
     {% if videosources %}
         <h5>Videos:</h5>
         <ul class="list-group">
-                {% for video in videosources %}
-                     <li class="list-group-item">
-                    <img alt="{{ video.name }}" class="with-gif" data-alt-src="{{ video.gif.image.url }}" src="{{ video.preview.image.url }}"/> <br/>
-                    <a href="{% url 'play_video' video.id %}">{{  video.name }}</a><br>
-                     </li>
-                {% endfor %}
+            {% for video in videosources %}
+                <li class="list-group-item">
+                    <img alt="{{ video.name }}" class="with-gif" data-alt-src="{{ video.gif.image.url }}"
+                         src="{{ video.preview.image.url }}"/> <br/>
+                    <a href="{% url 'play_video' video.id %}">{{ video.name }}</a><br>
+                </li>
+            {% endfor %}
         </ul>
     {% endif %}
 {% endblock %}
