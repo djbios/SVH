@@ -79,7 +79,7 @@ volumes:
   sources_host:
     driver_opts:
       type: none
-      device: "/home/djbios/videosources"
+      device: "/www/svh/videosources"
       o: bind
   sources: {}
   settings: {}
