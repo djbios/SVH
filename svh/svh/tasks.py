@@ -1,8 +1,6 @@
 from django.conf import settings
 import os
-
 from django.core.files.base import ContentFile
-
 from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview, Gif
 import imohash
 from svh.utils import Protocol
@@ -13,9 +11,17 @@ import cv2
 import random
 from svh.utils import timeit, log_exception
 import io
+from svh.celery import app
 
 VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi', 'mov', 'wmv', 'yuv', 'rm', 'mp4', 'm4p',
                     'mpg', 'mpeg', 'mp2', 'mpv', 'mpe', 'm4v', '3gp', 'mts']
+
+@app.task
+def update_library():
+    folder_traverser()
+    check_deleted_videosources()
+    update_video_sizes()  # todo this should be in VideFolder/Videosource model lazyattr
+    update_video_previews()
 
 
 @timeit

@@ -2,8 +2,10 @@ import time
 from twisted.internet import protocol, defer
 from crochet import setup
 from svh.models import VideoFile, VideoFolder
+from django.conf import settings
 
 setup()
+
 
 class Protocol(protocol.ProcessProtocol):
     logs = []
@@ -48,5 +50,8 @@ def log_exception(method):
 
     return logged
 
-def add_types_in_context(request):
-    return {'types': VideoFolder.objects.all_types()}
+def common_context_variables(request):
+    return {
+        'types': VideoFolder.objects.all_types(),
+        'metrika': settings.METRICS_SCRIPT
+    }
