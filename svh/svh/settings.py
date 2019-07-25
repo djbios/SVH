@@ -63,7 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'svh.utils.add_types_in_context'
+                'svh.utils.common_context_variables'
             ],
         },
     },
@@ -140,5 +140,7 @@ PREVIEW_HEIGHT = 200
 DESCRIPTION_FILENAME = 'description.yaml'
 MAX_THREADS_REACTOR = 5
 AS_IS_BY_DEFAULT = True
+
+METRICS_SCRIPT = '' # override this in local settings with Yandex.Metrika or whatever
 
 from svh.settings_local import *
