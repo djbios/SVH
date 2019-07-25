@@ -2,8 +2,9 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 from svh.forms import AddFolderForm
-from svh.models import VideoFile, VideoFolder, VideoSource
-from svh.tasks import download_torrent
+from svh.models import VideoFolder, VideoSource
+from svh.tasks import download_torrent, update_library
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 def index(request):
@@ -11,7 +12,6 @@ def index(request):
     if not root:
         return HttpResponse("No video content")
     return page_from(request, root.pk)
-
 
 
 def page_from(request, root):
@@ -47,3 +47,7 @@ def page_by_type(request, type):
     return render(request, 'svh/index.html',{
         'folders': folders,
     })
+
+@staff_member_required
+def update_library_cmd(request):
+    update_library.delay()
