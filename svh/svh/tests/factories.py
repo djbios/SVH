@@ -1,6 +1,6 @@
 import factory.fuzzy
 from svh.models import VideoFolder, VideoSource, VideoFile, VIDEO_FORMATS
-
+from django.contrib.auth.models import User
 
 class VideoFolderFactory(factory.DjangoModelFactory):
     class Meta:
@@ -30,3 +30,20 @@ class VideoFileFactory(factory.DjangoModelFactory):
     sizeBytes = factory.Faker('pyint')
     format = factory.fuzzy.FuzzyChoice(dict(VIDEO_FORMATS).keys())
     source = factory.SubFactory(VideoSourceFactory)
+
+
+class UserFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    email = factory.Faker('email')
+    username = factory.LazyAttribute(lambda o: o.email)
+
+
+class AdminFactory(UserFactory):
+    @factory.post_generation
+    def make_superuser(obj, create, extracted):
+        obj.is_staff = True
+        obj.is_admin = True
+        obj.is_superuser = True
+        obj.save()
