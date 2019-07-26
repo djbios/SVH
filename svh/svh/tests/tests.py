@@ -87,3 +87,16 @@ class CoreTests(TestCase):
         self.assertEqual(yaml['description'], vf.description)
         self.assertEqual(yaml['name'], vf._name)
 
+    def test_admin_features_admin(self):
+        admin = AdminFactory()
+        VideoSourceFactory()
+        self.client.force_login(admin)
+        response = self.client.get('/')
+        self.assertIn('form id="updateLibraryForm"', str(response.content))
+
+    def test_admin_features_user(self):
+        admin = UserFactory()
+        VideoSourceFactory()
+        self.client.force_login(admin)
+        response = self.client.get('/')
+        self.assertNotIn('form id="updateLibraryForm"', str(response.content))
