@@ -46,6 +46,7 @@ services:
     volumes:
       - settings:/www/svh/svh/settings_local/
       - media:/www/svh/media/
+      - sources:/www/svh/sources
     depends_on:
       - postgres
     links:
