@@ -108,3 +108,5 @@ settings_local.py
 **/media
 **/.vs
 *DotSettings.*
+
+svh/static/
