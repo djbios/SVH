@@ -71,6 +71,16 @@ services:
       - rabbit:/var/lib/rabbitmq
     restart: always
 
+  torrent:
+    image: wernight/qbittorrent
+    volumes:
+      - sources:/downloads
+    restart: always
+    ports:
+      - 127.0.0.1:8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+
 volumes:
   db_data: {}
   media: {}

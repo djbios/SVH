@@ -12,3 +12,4 @@ django-mptt
 celery
 moviepy
 pyyaml
+qbittorrent-api
