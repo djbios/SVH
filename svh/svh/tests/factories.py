@@ -16,7 +16,7 @@ class VideoSourceFactory(factory.DjangoModelFactory):
     class Meta:
         model = VideoSource
 
-    _name = factory.Faker('word')
+    _name = factory.Faker('name')
     path = factory.Faker('file_path')
     hash = factory.Faker('pystr')
     sizeBytes = factory.Faker('pyint')

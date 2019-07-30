@@ -42,7 +42,7 @@ class CoreTests(TestCase):
         vs = VideoSourceFactory()
         self.client.get('/')
         response = self.client.get(reverse('page',args=[vs.folder.id]))
-        self.assertNotIn(vs.name, response)
+        self.assertNotIn(vs.name, str(response.content))
 
     def test_videofolder(self):
         vf = VideoFolderFactory()
@@ -52,9 +52,9 @@ class CoreTests(TestCase):
     def test_videofolder_without_files(self):
         vf = VideoFolderFactory()
         response = self.client.get('/')
-        self.assertNotIn(vf.name, response)
+        self.assertNotIn(vf.name, str(response.content))
 
-    def test_videofile(self):
+    def test_play_video(self):
         vfile = VideoFileFactory()
         response = self.client.get(reverse('play_video', args=[vfile.source.id]))
         self.assertEqual(response.status_code, 200)
@@ -100,3 +100,20 @@ class CoreTests(TestCase):
         self.client.force_login(admin)
         response = self.client.get('/')
         self.assertNotIn('form id="updateLibraryForm"', str(response.content))
+
+    def test_not_published_videosource(self):
+        vf = VideoFileFactory()
+        self.client.get('/')
+        response = self.client.get(reverse('page', args=[vf.source.folder.id]))
+        self.assertNotIn(vf.source.name, str(response.content))
+
+        self.client.force_login(AdminFactory())
+        response = self.client.get(reverse('page', args=[vf.source.folder.id]))
+        self.assertIn(vf.source.name, str(response.content))
+
+    def test_published_videosource(self):
+        vs = VideoSourceFactory(published=True)
+        vf = VideoFileFactory(source=vs)
+        self.client.get('/')
+        response = self.client.get(reverse('page', args=[vs.folder.id]))
+        self.assertIn(vs.name, str(response.content))

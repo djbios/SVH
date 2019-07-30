@@ -67,9 +67,10 @@ class VideoSource(models.Model):
     deleted = models.BooleanField(default=False)
     folder = models.ForeignKey(VideoFolder,on_delete=models.SET_NULL, null=True)
     objects = VideoSourceManager()
+    published = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.path
+        return self.name
 
     @property
     def name(self):
@@ -88,6 +89,7 @@ class VideoSource(models.Model):
     @property
     def preview(self):
         return self.videofile.preview
+
 
 class VideoFile(models.Model): # todo delete file on model deletion
     path = models.CharField(max_length=2000, unique=True)

@@ -5,3 +5,8 @@ a.card-with-href, a.card-with-href:hover {
     margin-right: 10px;
     margin-bottom: 10px;
 }
+
+.disabled-li{
+    pointer-events:none;
+    opacity:0.4;
+}

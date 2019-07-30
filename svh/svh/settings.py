@@ -145,4 +145,6 @@ METRICS_SCRIPT = '' # override this in local settings with Yandex.Metrika or wha
 
 CELERY_BROKER_URL = 'amqp://rabbit'
 
+TORRENT_SERVICE_URL = 'http://torrent:8080'
+
 from svh.settings_local import *

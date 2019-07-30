@@ -180,5 +180,8 @@ def generate_gif(videosource):
         os.remove(fh.name)
         del fh
 
+
 def download_torrent(magnet, target_path):
-    pass
+    from qbittorrentapi import Client
+    client = Client(host='localhost:8080', username='admin', password='adminadmin')
+    client.torrents_add(urls=[magnet],save_path=target_path)
