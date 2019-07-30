@@ -21,10 +21,7 @@
         <h4><a href="{% url 'page' parent.id %}">{{ parent.name }}</a></h4>
     {% endif %}
 
-
-    {% if folders %}
-        <div>
-            {% if user.is_staff %}
+{% if user.is_staff %}
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Download
                     torrent here
                 </button>
@@ -53,6 +50,8 @@
                 </div>
             {% endif %}
 
+    {% if folders %}
+        <div>
             {% for folder in folders %}
                 {% if forloop.first %}
                     <div class="row">{% endif %}
