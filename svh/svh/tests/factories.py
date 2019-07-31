@@ -6,7 +6,7 @@ class VideoFolderFactory(factory.DjangoModelFactory):
     class Meta:
         model = VideoFolder
 
-    _name = factory.Faker('word')
+    _name = factory.Faker('name')
     path = factory.Faker('file_path')
     type = factory.Faker('word')
     description = factory.Faker('text')
