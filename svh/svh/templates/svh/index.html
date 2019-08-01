@@ -80,16 +80,15 @@
         <div class="album py-5 bg-light">
             <div class="container">
                 <h1>Videos:</h1>
-                <div class="row">
+                <div class="card-columns">
                     {% for video in videosources %}
-                        <div class="col-md-4">
-                            <div class="card mb-4 shadow-sm">
-                                <img class="with-gif card-img-top" alt="{{ video.name }}"
-                                     data-alt-src="{{ video.gif.image.url }}"
-                                     src="{{ video.preview.image.url }}"/> <br/>
-                                <div class="card-body">
-                                    <a href="{% url 'play_video' video.id %}">{{ video.name }}</a><br>
-                                </div>
+                        <div class="card mb-4 shadow-sm">
+                            <img class="with-gif card-img-top"
+                                 alt="{{ video.name }}"
+                                 data-alt-src="{{ video.gif.image.url }}"
+                                 src="{{ video.preview.image.url }}"/> <br/>
+                            <div class="card-body">
+                                <a href="{% url 'play_video' video.id %}">{{ video.name }}</a><br>
                             </div>
                         </div>
                     {% endfor %}
