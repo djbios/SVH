@@ -4,7 +4,7 @@ from django.contrib import admin
 from svh.views import index, play_video, page_from, page_by_type, update_library_cmd
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', index),
+    url(r'^$', index, name='index'),
     url(r'^videos/(\d+)/$', play_video, name='play_video'),
     url(r'(\d+)/$', page_from, name='page'),
     url(r'^types/([\w\-]+)/$', page_by_type, name='by_type'),

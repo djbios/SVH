@@ -1,7 +1,21 @@
 a.card-with-href, a.card-with-href:hover {
     color: inherit;
 }
-.card{
-    margin-right: 10px;
-    margin-bottom: 10px;
+/*.card{*/
+/*    margin-right: 10px;*/
+/*    margin-bottom: 10px;*/
+/*}*/
+
+footer {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+footer p {
+    margin-bottom: .25rem;
+}
+
+main {
+    padding-top: 5.0rem;
+    min-height: 60rem;
 }
