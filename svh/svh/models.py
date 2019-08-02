@@ -30,6 +30,9 @@ class VideoFolder(MPTTModel):
                             null=True, on_delete=models.DO_NOTHING)
     objects = VideoFolderManager()
 
+    def __str__(self):
+        return self.name
+
     @property
     def name(self):
         if self._name == None:
@@ -70,7 +73,7 @@ class VideoSource(models.Model):
     objects = VideoSourceManager()
     published = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -99,7 +102,7 @@ class VideoFile(models.Model): # todo delete file on model deletion
     source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
     is_fake = False
 
-    def __unicode__(self):
+    def __str__(self):
         return self.source.path + self.format
 
     @property
