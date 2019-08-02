@@ -7,6 +7,5 @@ a.card-with-href, a.card-with-href:hover {
 }
 
 .disabled-li{
-    pointer-events:none;
     opacity:0.4;
 }
