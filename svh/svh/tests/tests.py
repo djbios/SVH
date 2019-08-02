@@ -117,3 +117,27 @@ class CoreTests(TestCase):
         self.client.get('/')
         response = self.client.get(reverse('page', args=[vs.folder.id]))
         self.assertIn(vs.name, str(response.content))
+
+    def test_deleted_videosource(self):
+        vs = VideoSourceFactory(deleted=True)
+        vf = VideoFileFactory(source=vs)
+        self.client.get('/')
+        response = self.client.get(reverse('page', args=[vf.source.folder.id]))
+        self.assertNotIn(vf.source.name, str(response.content))
+
+        self.client.force_login(AdminFactory())
+        response = self.client.get(reverse('page', args=[vf.source.folder.id]))
+        self.assertNotIn(vf.source.name, str(response.content))
+
+    def test_deleted_videofolder(self):
+        root_folder = VideoFolderFactory()
+        child_folder = VideoFolderFactory(parent=root_folder)
+        vs = VideoSourceFactory(folder=child_folder,deleted=True)
+        vf = VideoFileFactory(source=vs)
+        self.client.get('/')
+        response = self.client.get(reverse('page', args=[root_folder.id]))
+        self.assertNotIn(vf.source.folder.name, str(response.content))
+
+        self.client.force_login(AdminFactory())
+        response = self.client.get(reverse('page', args=[root_folder.id]))
+        self.assertNotIn(vf.source.folder.name, str(response.content))

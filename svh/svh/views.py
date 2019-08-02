@@ -28,10 +28,12 @@ def page_from(request, root):
     else:
         add_folder_form = AddFolderForm()
 
-    children = root_folder.get_children()
+    children = root_folder.get_children().annotate(
+            not_deleted_videos_count=Count('videosource', filter=Q(videosource__deleted=False))).exclude(not_deleted_videos_count=0)
+
     videos = root_folder.videosource_set.all()
     if not request.user.is_staff:
-        children = children.annotate(published_videos_count=Count('videosource', filter=Q(videosource__published=True))).filter(published_videos_count=True)
+        children = children.annotate(published_videos_count=Count('videosource', filter=Q(videosource__published=True))).filter(published_videos_count__gt=0)
         videos = videos.filter(published=True)
 
     return render(request, 'svh/index.html', {
