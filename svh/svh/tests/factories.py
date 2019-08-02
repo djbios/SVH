@@ -2,6 +2,7 @@ import factory.fuzzy
 from svh.models import VideoFolder, VideoSource, VideoFile, VIDEO_FORMATS
 from django.contrib.auth.models import User
 
+
 class VideoFolderFactory(factory.DjangoModelFactory):
     class Meta:
         model = VideoFolder
@@ -12,6 +13,7 @@ class VideoFolderFactory(factory.DjangoModelFactory):
     description = factory.Faker('text')
     preview_path = factory.Faker('file_path')
 
+
 class VideoSourceFactory(factory.DjangoModelFactory):
     class Meta:
         model = VideoSource
@@ -21,6 +23,8 @@ class VideoSourceFactory(factory.DjangoModelFactory):
     hash = factory.Faker('pystr')
     sizeBytes = factory.Faker('pyint')
     folder = factory.SubFactory(VideoFolderFactory)
+    deleted = False
+
 
 class VideoFileFactory(factory.DjangoModelFactory):
     class Meta:

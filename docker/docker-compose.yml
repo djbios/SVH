@@ -75,7 +75,7 @@ services:
   torrent:
     image: wernight/qbittorrent
     volumes:
-      - sources:/downloads
+      - sources:/www/svh/sources
     restart: always
     ports:
       - 127.0.0.1:8080:8080
