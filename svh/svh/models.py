@@ -84,7 +84,7 @@ class VideoSource(models.Model):
 
     @property
     def videofile(self):
-        if settings.AS_IS_BY_DEFAULT and not self.videofile_set.exists():
+        if settings.ALLOW_SOURCE_SERVING and not self.videofile_set.exists():
             vf = VideoFile(path=self.path, format='default', source=self)
             vf.is_fake = True
             return vf

@@ -134,7 +134,7 @@ def convert_video_in_format(input_path, output_path, format='default'):
 @timeit
 @wait_for(timeout=36000)
 def convert_videos(format='default'):#todo use as is from sourse flag
-    if settings.AS_IS_BY_DEFAULT:
+    if settings.ALLOW_SOURCE_SERVING:
         return
     s = defer.DeferredSemaphore(settings.MAX_THREADS_REACTOR)
     deferreds = []

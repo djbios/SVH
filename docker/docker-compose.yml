@@ -71,6 +71,8 @@ services:
     volumes:
       - rabbit:/var/lib/rabbitmq
     restart: always
+    ports:
+      - 127.0.0.1:5672:5672
 
   torrent:
     image: wernight/qbittorrent
