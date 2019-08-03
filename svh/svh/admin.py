@@ -11,3 +11,4 @@ class VideoSourceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(VideoSource, VideoSourceAdmin)
+admin.site.register(VideoFolder)
