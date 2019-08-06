@@ -74,6 +74,7 @@ services:
     ports:
       - 127.0.0.1:5672:5672
 
+# Torrent service
   torrent:
     image: wernight/qbittorrent
     volumes:
@@ -87,7 +88,12 @@ services:
 volumes:
   db_data: {}
   media: {}
-  sources: {}
+  sources:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${SOURCES_PATH}
+      o: bind
   settings: {}
   rabbit: {}
   static: {}
