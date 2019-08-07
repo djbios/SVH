@@ -8,5 +8,7 @@
 # git clone https://github.com/djbios/SVH
 cd "$(dirname "$0")"
 
+: ${SVH_SOURCES:=/www/svh/sources}
+
 docker-compose -p svh build --pull
 docker-compose -p svh up -d --remove-orphans
