@@ -33,7 +33,7 @@ jobs:
       - add_ssh_keys
       - run:
           command: |
-            ssh $SSH_USER@$SSH_HOST "cd ./SVH && git pull origin master && git checkout -f $CIRCLE_SHA1 && ./docker/deploy.sh"
+            ssh $SSH_USER@$SSH_HOST "export SVH_SOURCES=$SVH_SOURCES && cd ./SVH && git pull origin master && git checkout -f $CIRCLE_SHA1 && ./docker/deploy.sh"
 
 workflows:
   version: 2
