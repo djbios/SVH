@@ -1,8 +1,5 @@
-import subprocess
-from django.contrib import admin
 from django.conf import settings
 from django.db import models
-from django.db.models import Q, Count
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 import os
@@ -11,10 +8,18 @@ VIDEO_FORMATS = (
     ('default', '-vcodec libx264'),
 )
 
+BIRTH_PLACES = ('user', 'torrent', 'upload')
+
 
 class VideoFolderManager(models.Manager):
     def all_types(self):
         return self.exclude(type=None).order_by().values_list('type', flat=True).distinct()
+
+    def get_queryset(self):
+        return super(VideoFolderManager, self).get_queryset().exclude(deleted=True)
+
+    def all_with_deleted(self, **kwargs):
+        return super(VideoFolderManager, self).get_queryset().all()
 
 
 class VideoFolder(MPTTModel):
@@ -28,6 +33,7 @@ class VideoFolder(MPTTModel):
     parent = TreeForeignKey('self',
                             related_name='folder_parent',
                             null=True, on_delete=models.DO_NOTHING)
+    deleted = models.BooleanField(default=False)
     objects = VideoFolderManager()
 
     def __str__(self):
@@ -62,6 +68,9 @@ class VideoSourceManager(models.Manager):
     def get_with_deleted(self, **kwargs):
         return super(VideoSourceManager, self).get_queryset().get(**kwargs)
 
+    def all_with_deleted(self, **kwargs):
+        return super(VideoSourceManager, self).get_queryset().all()
+
 
 class VideoSource(models.Model):
     _name = models.CharField(max_length=500, null=True, db_column='name')
@@ -86,7 +95,6 @@ class VideoSource(models.Model):
     def videofile(self):
         if settings.ALLOW_SOURCE_SERVING and not self.videofile_set.exists():
             vf = VideoFile(path=self.path, format='default', source=self)
-            vf.is_fake = True
             return vf
         return self.videofile_set.first()
 
@@ -95,12 +103,11 @@ class VideoSource(models.Model):
         return self.videofile.preview
 
 
-class VideoFile(models.Model): # todo delete file on model deletion
+class VideoFile(models.Model): # todo deletion logic
     path = models.CharField(max_length=2000, unique=True)
     sizeBytes = models.IntegerField(null=True)
     format = models.CharField(max_length=200, choices=VIDEO_FORMATS, default=VIDEO_FORMATS[0])
     source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
-    is_fake = False
 
     def __str__(self):
         return self.source.path + self.format
@@ -111,8 +118,6 @@ class VideoFile(models.Model): # todo delete file on model deletion
 
     @property
     def url(self):
-        if self.is_fake:
-            return '/fake%s' % self.path
         return self.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)
 
 

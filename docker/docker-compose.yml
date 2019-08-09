@@ -9,7 +9,6 @@ services:
     volumes:
       - media:/www/svh/media/
       - static:/www/svh/static
-      - sources:/www/svh/sources
     links:
       - uwsgi
     depends_on:
@@ -29,7 +28,6 @@ services:
     - settings:/www/svh/svh/settings_local/
     - media:/www/svh/media/
     - static:/www/svh/static
-    - sources:/www/svh/sources
     depends_on:
     - postgres
     links:
@@ -47,7 +45,6 @@ services:
     volumes:
       - settings:/www/svh/svh/settings_local/
       - media:/www/svh/media/
-      - sources:/www/svh/sources
     depends_on:
       - postgres
     links:
@@ -78,7 +75,7 @@ services:
   torrent:
     image: wernight/qbittorrent
     volumes:
-      - sources:/www/svh/sources
+      - media:/www/svh/media
     restart: always
     ports:
       - 127.0.0.1:8080:8080
@@ -87,12 +84,11 @@ services:
 
 volumes:
   db_data: {}
-  media: {}
-  sources:
+  media:
     driver: local
     driver_opts:
       type: none
-      device: ${SOURCES_PATH}
+      device: ${MEDIA_PATH}
       o: bind
   settings: {}
   rabbit: {}

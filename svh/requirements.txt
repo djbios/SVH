@@ -13,3 +13,4 @@ celery
 moviepy
 pyyaml
 qbittorrent-api
+ffmpeg-python
