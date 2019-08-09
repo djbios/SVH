@@ -1,8 +1,6 @@
-from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 
 from svh.forms import AddFolderForm

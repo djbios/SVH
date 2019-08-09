@@ -80,7 +80,7 @@
         <ul class="list-group">
             {% for video in videosources %}
                 <li class="list-group-item {% if not video.published %}disabled-li{% endif %}">
-                    <img alt="{{ video.name }}" class="with-gif" data-alt-src="{{ video.gif.image.url }}"
+                    <img alt="{{ video.name }}" {% if video.gif %} class="with-gif" {% endif %} data-alt-src="{{ video.gif.image.url }}"
                          src="{{ video.preview.image.url }}"/> <br/>
                     <a href="{% url 'play_video' video.id %}">{{ video.name }}</a><br>
                 </li>

@@ -136,7 +136,6 @@ MEDIA_ROOT = '/www/svh/media/'
 
 
 # SVH settings
-SOURCE_VIDEOS_PATH = '/www/svh/sources'
 PREVIEW_HEIGHT = 200
 DESCRIPTION_FILENAME = 'description.yaml'
 MAX_THREADS_REACTOR = 5
@@ -148,3 +147,4 @@ CELERY_BROKER_URL = 'amqp://rabbit'
 TORRENT_SERVICE_URL = 'http://torrent:8080'
 
 from svh.settings_local import *
+SOURCE_VIDEOS_PATH = os.path.join(MEDIA_ROOT, 'sources')
