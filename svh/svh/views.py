@@ -66,5 +66,5 @@ def is_superuser(request):
 
 @staff_member_required
 def update_library_cmd(request):
-    update_library.delay()
+    update_library()#.delay()
     return HttpResponse("OK")

@@ -99,14 +99,14 @@ def generate_preview(videosource):
     def get_random_frames(video_path, count=1):  # todo slow
         cap = cv2.VideoCapture(video_path)
         video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
-        targets = random.sample(range(min(video_length, 25 * 5)), count) # todo gif length in settings
+        targets = random.sample(range(min(video_length, 25 * 20)), count)
         frames = []
         if cap.isOpened() and video_length > 0:
             i = 0
             success, image = cap.read()
             while success and i <= max(targets):
-                success, image = cap.read()  # todo black
-                if i in targets:
+                success, image = cap.read()
+                if i in targets and image.mean() > 10:
                     frames.append(image)
                 i += 1
         return frames
@@ -140,7 +140,7 @@ def generate_gif(videosource):
     scale = settings.PREVIEW_HEIGHT / clip.size[1]
     gif = Gif(videosource=videosource)
     gif.image.save(filename, ContentFile(''))
-    clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(gif.image.path)
+    clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(gif.image.path) # todo gif length in settings
     gif.save()
 
 
@@ -158,7 +158,7 @@ def convert_videosource_task(video_source_id, format):
         print("Video is converted already")
 
     vf = VideoFile(source=vs, format=format)
-    vf.path = os.path.join(settings.MEDIA_ROOT, '%s_%s.mp4' % vs.hash, format)
+    vf.path = os.path.join(settings.MEDIA_ROOT, '%s_%s.mp4' % (vs.hash, format))
     convert_video_to_format(vs.path, vf.path, format)
     vf.sizeBytes = os.stat(vf.path).st_size
     vf.save()
