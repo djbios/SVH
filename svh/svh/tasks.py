@@ -148,14 +148,14 @@ def generate_gif(videosource):
 def download_torrent(magnet, target_path):
     from qbittorrentapi import Client
     client = Client(host=settings.TORRENT_SERVICE_URL, username='admin', password='adminadmin')
-    client.torrents_add(urls=[magnet],save_path=target_path)
+    client.torrents_add(urls=[magnet], save_path=target_path)
 
 
 @app.task
 def convert_videosource_task(video_source_id, format):
     vs = VideoSource.objects.get(id=video_source_id)
     if vs.videofile_set.filter(format=format).exists(): #todo test it
-        print("Video is converted already")
+        print("Video is already converted.")
 
     vf = VideoFile(source=vs, format=format)
     vf.path = os.path.join(settings.MEDIA_ROOT, '%s_%s.mp4' % (vs.hash, format))
@@ -163,3 +163,9 @@ def convert_videosource_task(video_source_id, format):
     vf.sizeBytes = os.stat(vf.path).st_size
     vf.save()
 
+
+@app.task
+def check_torrents():
+    from qbittorrentapi import Client
+    client = Client(host=settings.TORRENT_SERVICE_URL, username='admin', password='adminadmin')
+    client.torrents.info()

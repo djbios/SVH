@@ -114,13 +114,16 @@ class CoreTests(TestCase):
     def test_published_videosource(self):
         vs = VideoSourceFactory(published=True)
         vf = VideoFileFactory(source=vs)
+
         self.client.get('/')
+
         response = self.client.get(reverse('page', args=[vs.folder.id]))
         self.assertIn(vs.name, str(response.content))
 
     def test_deleted_videosource(self):
         vs = VideoSourceFactory(deleted=True)
         vf = VideoFileFactory(source=vs)
+
         self.client.get('/')
         response = self.client.get(reverse('page', args=[vf.source.folder.id]))
         self.assertNotIn(vf.source.name, str(response.content))
@@ -128,3 +131,26 @@ class CoreTests(TestCase):
         self.client.force_login(AdminFactory())
         response = self.client.get(reverse('page', args=[vf.source.folder.id]))
         self.assertNotIn(vf.source.name, str(response.content))
+
+    def test_preview(self):
+        vf1 = VideoFolderFactory()
+        preview = PreviewFactory()
+        vf2 = preview.videosource.folder
+        vf2.parent = vf1
+        vf2.save()
+        response = self.client.get(reverse('page', args=[vf1.id]))
+        self.assertIn(preview.image.url, str(response.content))
+
+    def test_included_preview(self):
+        vf0 = VideoFolderFactory()
+        vf1 = VideoFolderFactory()
+        vf1.parent = vf0
+        vf1.save()
+
+        preview = PreviewFactory()
+        vf2 = preview.videosource.folder
+        vf2.parent = vf1
+        vf2.save()
+
+        response = self.client.get(reverse('page', args=[vf0.id]))
+        self.assertIn(preview.image.url, str(response.content))

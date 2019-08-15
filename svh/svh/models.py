@@ -35,6 +35,7 @@ class VideoFolder(MPTTModel):
                             null=True, on_delete=models.DO_NOTHING)
     deleted = models.BooleanField(default=False)
     objects = VideoFolderManager()
+    published = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -58,6 +59,8 @@ class VideoFolder(MPTTModel):
     @property
     def preview(self):
         sources = self.videosource_set.exclude(preview=None)
+        if not sources.exists():
+            sources = VideoSource.objects.filter(folder__in=self.get_descendants()).exclude(preview=None)
         return sources.first().preview if sources.exists() else None
 
 
