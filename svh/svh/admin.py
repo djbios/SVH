@@ -1,6 +1,7 @@
 from django.contrib import admin
 from svh.models import *
 from svh.tasks import convert_videosource_task
+from mptt.admin import DraggableMPTTAdmin
 
 
 class VideoSourceAdmin(admin.ModelAdmin):
@@ -22,4 +23,4 @@ class VideoSourceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(VideoSource, VideoSourceAdmin)
-admin.site.register(VideoFolder)
+admin.site.register(VideoFolder, DraggableMPTTAdmin)

@@ -28,10 +28,10 @@ def page_from(request, root):
 
     children = root_folder.get_children()
 
-    videos = root_folder.videosource_set.all()
+    videos = root_folder.videosource_set.order_by()
     if not request.user.is_staff:
-        children = children.annotate(published_videos_count=Count('videosource', filter=Q(videosource__published=True))).filter(published_videos_count__gt=0) # todo make manual published flag
-        videos = videos.filter(published=True)
+        children = children.filter(published=True).order_by('_name')
+        videos = videos.filter(published=True).order_by('_name')
 
     return render(request, 'svh/index.html', {
         'parent': root_folder.parent,
@@ -66,5 +66,5 @@ def is_superuser(request):
 
 @staff_member_required
 def update_library_cmd(request):
-    update_library.delay()
+    update_library()#.delay()
     return HttpResponse("OK")

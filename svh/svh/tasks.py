@@ -99,14 +99,14 @@ def generate_preview(videosource):
     def get_random_frames(video_path, count=1):  # todo slow
         cap = cv2.VideoCapture(video_path)
         video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
-        targets = random.sample(range(min(video_length, 25 * 5)), count) # todo gif length in settings
+        targets = random.sample(range(min(video_length, 25 * 20)), count)
         frames = []
         if cap.isOpened() and video_length > 0:
             i = 0
             success, image = cap.read()
             while success and i <= max(targets):
-                success, image = cap.read()  # todo black
-                if i in targets:
+                success, image = cap.read()
+                if i in targets and image.mean() > 10:
                     frames.append(image)
                 i += 1
         return frames
@@ -140,7 +140,7 @@ def generate_gif(videosource):
     scale = settings.PREVIEW_HEIGHT / clip.size[1]
     gif = Gif(videosource=videosource)
     gif.image.save(filename, ContentFile(''))
-    clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(gif.image.path)
+    clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(gif.image.path) # todo gif length in settings
     gif.save()
 
 
@@ -148,18 +148,24 @@ def generate_gif(videosource):
 def download_torrent(magnet, target_path):
     from qbittorrentapi import Client
     client = Client(host=settings.TORRENT_SERVICE_URL, username='admin', password='adminadmin')
-    client.torrents_add(urls=[magnet],save_path=target_path)
+    client.torrents_add(urls=[magnet], save_path=target_path)
 
 
 @app.task
 def convert_videosource_task(video_source_id, format):
     vs = VideoSource.objects.get(id=video_source_id)
     if vs.videofile_set.filter(format=format).exists(): #todo test it
-        print("Video is converted already")
+        print("Video is already converted.")
 
     vf = VideoFile(source=vs, format=format)
-    vf.path = os.path.join(settings.MEDIA_ROOT, '%s_%s.mp4' % vs.hash, format)
+    vf.path = os.path.join(settings.MEDIA_ROOT, '%s_%s.mp4' % (vs.hash, format))
     convert_video_to_format(vs.path, vf.path, format)
     vf.sizeBytes = os.stat(vf.path).st_size
     vf.save()
 
+
+@app.task
+def check_torrents():
+    from qbittorrentapi import Client
+    client = Client(host=settings.TORRENT_SERVICE_URL, username='admin', password='adminadmin')
+    client.torrents.info()

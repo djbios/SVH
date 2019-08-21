@@ -145,6 +145,7 @@ METRICS_SCRIPT = '' # override this in local settings with Yandex.Metrika or wha
 CELERY_BROKER_URL = 'amqp://rabbit'
 
 TORRENT_SERVICE_URL = 'http://torrent:8080'
+X264_PRESET = 'veryfast'
 
 from svh.settings_local import *
 SOURCE_VIDEOS_PATH = os.path.join(MEDIA_ROOT, 'sources')
