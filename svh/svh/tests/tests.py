@@ -154,3 +154,4 @@ class CoreTests(TestCase):
 
         response = self.client.get(reverse('page', args=[vf0.id]))
         self.assertIn(preview.image.url, str(response.content))
+

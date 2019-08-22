@@ -25,14 +25,14 @@ class VideoFolderManager(models.Manager):
 class VideoFolder(MPTTModel):
     class Meta:
         ordering = ('path',)
-    _name = models.CharField(max_length=500, null=True, db_column='name')
+    _name = models.CharField(max_length=500, null=True, db_column='name', blank=True)
     path = models.CharField(max_length=2000, unique=True)
-    type = models.CharField(max_length=200, null=True)
-    description = models.TextField(null=True)
-    preview_path = models.CharField(max_length=2000, null=True)
+    type = models.CharField(max_length=200, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    preview_path = models.CharField(max_length=2000, null=True, blank=True)
     parent = TreeForeignKey('self',
                             related_name='folder_parent',
-                            null=True, on_delete=models.DO_NOTHING)
+                            null=True, on_delete=models.DO_NOTHING, blank=True)
     deleted = models.BooleanField(default=False)
     objects = VideoFolderManager()
     published = models.BooleanField(default=False)
