@@ -141,6 +141,7 @@ class CoreTests(TestCase):
         response = self.client.get(reverse('page', args=[vf1.id]))
         self.assertIn(preview.image.url, str(response.content))
 
+
     def test_included_preview(self):
         vf0 = VideoFolderFactory()
         vf1 = VideoFolderFactory()
