@@ -55,16 +55,3 @@ def page_by_type(request, type):
     return render(request, 'svh/index.html', {
         'folders': folders,
     })
-
-
-@csrf_exempt
-def is_superuser(request):
-    if request.user.is_staff:
-        return HttpResponse()
-    else:
-        return HttpResponseForbidden()
-
-@staff_member_required
-def update_library_cmd(request):
-    update_library()#.delay()
-    return HttpResponse("OK")

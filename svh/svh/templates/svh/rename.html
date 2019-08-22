@@ -1,0 +1,48 @@
+{% extends "svh/base.html" %}
+{% block navigation %}
+
+{% endblock %}
+{% block content %}
+    <form action='{% url 'rename' %}?{{ request.GET.urlencode }}'>
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Rename"/>
+    </form>
+
+    {% for vs in vs_list %}
+        <div class="namePair">
+            <label class="oldName">{{ vs.name }}</label> - <label class="newName"></label> <br>
+        </div>
+
+    {% endfor %}
+
+    <script>
+        let update_func = function(){
+              $( ".namePair" ).each(function( index ) {
+                    let oldname = $(this).children('.oldName');
+                    let newname = $(this).children('.newName');
+                    $.ajax({
+                            method: "GET",
+                            url:  '{% url 'regex' %}?str='+oldname.text()+'&&find='+$('#id_find').val()+'&&replace='+$('#id_replace').val(),
+                            success: function (data, textStatus) {
+                                newname.html(data)
+                            }
+                        });
+                    });
+        };
+
+        $(document).ready(function () {
+            $('#id_find').on('input', function () {
+                update_func();
+            });
+        });
+
+        $(document).ready(function () {
+            $('#id_replace').on('input', function () {
+                update_func();
+            });
+        });
+        update_func();
+    </script>
+
+{% endblock %}
