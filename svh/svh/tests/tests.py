@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from svh.tasks import folder_traverser
 from svh.tests.factories import *
@@ -132,6 +132,7 @@ class CoreTests(TestCase):
         response = self.client.get(reverse('page', args=[vf.source.folder.id]))
         self.assertNotIn(vf.source.name, str(response.content))
 
+    @override_settings(MEDIA_ROOT = '/tmp')
     def test_preview(self):
         vf1 = VideoFolderFactory()
         preview = PreviewFactory()
@@ -141,7 +142,7 @@ class CoreTests(TestCase):
         response = self.client.get(reverse('page', args=[vf1.id]))
         self.assertIn(preview.image.url, str(response.content))
 
-
+    @override_settings(MEDIA_ROOT='/tmp')
     def test_included_preview(self):
         vf0 = VideoFolderFactory()
         vf1 = VideoFolderFactory()
