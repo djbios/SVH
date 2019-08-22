@@ -3,9 +3,6 @@ import os
 from django.core.files.base import ContentFile
 from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview, Gif
 import imohash
-from svh.utils import Protocol
-from twisted.internet import reactor, defer
-from crochet import wait_for
 import yaml
 import cv2
 import random

@@ -3,8 +3,6 @@ uwsgi
 ipython
 psycopg2-binary
 imohash
-twisted
-crochet
 pillow
 opencv-python
 factory_boy

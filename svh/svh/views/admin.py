@@ -1,5 +1,5 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 import re
 
@@ -9,17 +9,20 @@ from svh.models import VideoSource
 
 @staff_member_required
 def regex_rename_sources(request):
-    vs_list = [get_object_or_404(VideoSource, id=i) for i in request.GET['ids'].split(',')]
+    ids = request.GET.get('ids') or request.POST.get('ids')
+    if not ids:
+        return HttpResponseBadRequest()
+    vs_list = [get_object_or_404(VideoSource, id=i) for i in ids.split(',')]
 
     if request.method == 'POST':
-        form = RenameForm(request)
+        form = RenameForm(request.POST)
         if form.is_valid():
             for vs in vs_list:
-                vs._name = _regex(vs.name, form.find, form.replace)
+                vs._name = _regex(vs.name, form.cleaned_data.get('find'), form.cleaned_data.get('replace'))
                 vs.save()
-            return HttpResponseRedirect('/admin')
+            form = RenameForm({'ids': ids})
     else:
-        form = RenameForm()
+        form = RenameForm(request.GET)
 
     context = {
         'vs_list': vs_list,

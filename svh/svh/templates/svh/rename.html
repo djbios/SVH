@@ -3,9 +3,9 @@
 
 {% endblock %}
 {% block content %}
-    <form action='{% url 'rename' %}?{{ request.GET.urlencode }}'>
+    <form method="post" action='{% url 'rename' %}'>
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
         <input type="submit" value="Rename"/>
     </form>
 
