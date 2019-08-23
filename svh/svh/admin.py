@@ -32,3 +32,6 @@ class VideoSourceAdmin(admin.ModelAdmin):
 
 admin.site.register(VideoSource, VideoSourceAdmin)
 admin.site.register(VideoFolder, DraggableMPTTAdmin)
+admin.site.register(Gif)
+admin.site.register(Preview)
+admin.site.register(VideoFile)
