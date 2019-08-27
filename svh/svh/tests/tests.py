@@ -7,6 +7,8 @@ from svh.tests.factories import *
 import os
 
 
+@override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+                       CELERY_TASK_ALWAYS_EAGER=True)
 class CoreTests(TestCase):
     def test_empty_homepage(self):
         resp = self.client.get('/')
