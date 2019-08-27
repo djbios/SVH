@@ -1,18 +1,15 @@
-from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.views.decorators.csrf import csrf_exempt
 
 from svh.forms import AddFolderForm
 from svh.models import VideoFolder, VideoSource
 from svh.tasks import download_torrent, update_library
-from django.contrib.admin.views.decorators import staff_member_required
 
 
 def index(request):
     root = VideoFolder.objects.filter(level=0).first()
     if not root:
-        return HttpResponse("No video content")
+        return render(request, 'svh/index.html')
     return page_from(request, root.pk)
 
 

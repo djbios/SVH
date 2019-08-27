@@ -87,10 +87,6 @@ def update_video_previews():
         if not vs.preview_set.exists():
             generate_preview(vs)
 
-    for vs in VideoSource.objects.all():
-        if not hasattr(vs, 'gif'):
-            generate_gif(vs)
-
 @timeit
 def generate_preview(videosource):
     def get_random_frames(video_path, count=1):  # todo slow
@@ -140,6 +136,10 @@ def generate_gif(videosource):
     clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(gif.image.path) # todo gif length in settings
     gif.save()
 
+
+@app.task
+def generate_gif_task(vs_id):
+    generate_gif(VideoSource.objects.get(id=vs_id))
 
 @log_exception
 def download_torrent(magnet, target_path):

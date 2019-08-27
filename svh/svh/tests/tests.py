@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import patch
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -6,6 +7,8 @@ from svh.tests.factories import *
 import os
 
 
+@override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+                       CELERY_TASK_ALWAYS_EAGER=True)
 class CoreTests(TestCase):
     def test_empty_homepage(self):
         resp = self.client.get('/')
@@ -157,3 +160,28 @@ class CoreTests(TestCase):
         response = self.client.get(reverse('page', args=[vf0.id]))
         self.assertIn(preview.image.url, str(response.content))
 
+    def batch_rename(self):
+        find = 'str to find'
+        replace = 'str to replace'
+        self.client.force_login(AdminFactory())
+        vs_list = VideoSourceFactory.create_batch(10)
+        for vs in vs_list:
+            vs._name=vs._name + find
+            vs.save()
+
+        response = self.client.get(reverse('rename')+'?ids='+','.join(str(x.id) for x in vs_list))
+
+        self.assertEqual(response.status_code, 200)
+        for vs in vs_list:
+            self.assertIn(vs.name, str(response.content))
+
+        response = self.client.post(reverse('rename'), {
+            'ids': ','.join(str(x.id) for x in vs_list),
+            'find': find,
+            'replace': replace
+        })
+
+        self.assertEqual(response.status_code, 200)
+        for vs in VideoSource.objects.all():
+            self.assertNotIn(find, vs.name)
+            self.assertIn(replace, vs.name)

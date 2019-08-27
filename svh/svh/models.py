@@ -43,7 +43,7 @@ class VideoFolder(MPTTModel):
     @property
     def name(self):
         if self._name == None:
-            return os.path.splitext(self.path)[0]
+            return os.path.splitext(self.path)[0].replace(settings.SOURCE_VIDEOS_PATH,'')[1:]
         return self._name
 
     @property
@@ -105,6 +105,18 @@ class VideoSource(models.Model):
     def preview(self):
         return self.videofile.preview
 
+    @property
+    def gif_url(self):
+        from svh.tasks import generate_gif_task
+        if hasattr(self, 'gif'):
+            return self.gif.image.url
+        else:
+            generate_gif_task.delay(self.id)
+            if self.preview:
+                return self.preview.image.url
+            else:
+                return None  # todo if no preview - return default img
+
 
 class VideoFile(models.Model): # todo deletion logic
     path = models.CharField(max_length=2000, unique=True)
@@ -133,5 +145,3 @@ class Preview(models.Model): # todo delete file on model deletion
 class Gif(models.Model): # todo delete file on model deletion
     videosource = models.OneToOneField(VideoSource, on_delete=models.CASCADE)
     image = models.FileField(upload_to='gifs')
-
-#todo https://pypi.org/project/watchdog/ filesystem monitoring
