@@ -112,7 +112,11 @@ class VideoSource(models.Model):
             return self.gif.image.url
         else:
             generate_gif_task.delay(self.id)
-            return self.preview.image.url
+            if self.preview:
+                return self.preview.image.url
+            else:
+                return None  # todo if no preview - return default img
+
 
 class VideoFile(models.Model): # todo deletion logic
     path = models.CharField(max_length=2000, unique=True)
@@ -130,8 +134,6 @@ class VideoFile(models.Model): # todo deletion logic
     @property
     def url(self):
         return self.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)
-
-
 
 
 class Preview(models.Model): # todo delete file on model deletion
