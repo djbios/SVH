@@ -108,4 +108,7 @@ settings_local.py
 **/media
 **/.vs
 *DotSettings.*
-/bin
+
+#NetCore
+bin/
+obj/
