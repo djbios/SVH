@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,9 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using SVH.FileService.Core.Configuration;
 using SVH.FileService.Core.Services;
 using SVH.FileService.Core.Services.Contracts;
 using SVH.FileService.Database;
@@ -45,6 +48,9 @@ namespace SVH.FileService.Host
 
             services.AddEntityFrameworkNpgsql().AddDbContext<FileServiceContext>()
                 .BuildServiceProvider();
+
+
+            services.Configure<FileServiceSettings>(Configuration.GetSection("FileService"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +70,7 @@ namespace SVH.FileService.Host
             }
 
             app.UseMvc();
+            
         }
     }
 }

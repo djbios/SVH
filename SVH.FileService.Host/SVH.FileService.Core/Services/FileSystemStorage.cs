@@ -16,10 +16,14 @@ namespace SVH.FileService.Core.Services
             _fileSystem = fileSystem;
         }
 
-        public Task<ICollection<string>> ScanDirectory(string path = "D:\\media")
+        public async Task<ICollection<string>> ScanDirectory(string path)
         {
-            ICollection<string> result = _fileSystem.Directory.EnumerateFiles(path).ToList();
-            return Task.FromResult(result); //todo add dirs
+            List<string> result = _fileSystem.Directory.EnumerateFiles(path).ToList();
+            foreach (var directory in _fileSystem.Directory.EnumerateDirectories(path))
+            {
+                result.AddRange(await ScanDirectory(directory));
+            }
+            return result;
         }
 
         public async Task<Stream> GetFileContent(string path)

@@ -1,9 +1,0 @@
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\bin\Debug\netcoreapp2.2\SVH.FileService.Database.deps.json
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\bin\Debug\netcoreapp2.2\SVH.FileService.Database.dll
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\obj\Debug\netcoreapp2.2\SVH.FileService.Database.csprojAssemblyReference.cache
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\obj\Debug\netcoreapp2.2\SVH.FileService.Database.csproj.CoreCompileInputs.cache
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\obj\Debug\netcoreapp2.2\SVH.FileService.Database.AssemblyInfoInputs.cache
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\obj\Debug\netcoreapp2.2\SVH.FileService.Database.AssemblyInfo.cs
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\bin\Debug\netcoreapp2.2\SVH.FileService.Database.pdb
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\obj\Debug\netcoreapp2.2\SVH.FileService.Database.dll
-C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Database\obj\Debug\netcoreapp2.2\SVH.FileService.Database.pdb

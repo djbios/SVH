@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using AutoMapper;
 using SVH.FileService.Core.Models;
@@ -19,9 +20,13 @@ namespace SVH.FileService.Core.Mappings
             Mapper = config.CreateMapper();
         }
 
-        public static ICollection<FileDto> ToDtoCollection(this ICollection<FileDbModel> dbModels)
+        public static ICollection<FileDto> ToDtoCollection(this ICollection<FileDbModel> dbModels, string rootToRemove)
         {
-            return Mapper.Map<ICollection<FileDto>>(dbModels);
+            return Mapper.Map<ICollection<FileDto>>(dbModels).Select(f=>
+            {
+                f.FileName = f.FileName.Replace(rootToRemove, "");
+                return f;
+            }).ToList();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace SVH.FileService.Host.Controllers
         {
             _fileService = fileService;
         }
-        // GET api/values
+        
         [HttpGet]
         [ProducesResponseType(typeof(ICollection<FileDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -33,10 +33,18 @@ namespace SVH.FileService.Host.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(Guid id)
         {
-            var stream = await _fileService.GetFile(id);
-            return Ok(File(stream, "video/mp4"));
+            var physicalPath = await _fileService.GetFileName(id);
+            return PhysicalFile(physicalPath, "video/mp4", "video.mp4");
         }
-
+        
+        [HttpGet("{id}/preview")]
+        public async Task<ActionResult> GetPreview(Guid id)
+        {
+            var physicalPath = await _fileService.GetFileName(id);
+            return PhysicalFile(physicalPath, "video/mp4", "video.mp4");
+        }
+        
+        //todo get preview, get gif, get in format, convert in format, download torrent in path, live in format
         // POST api/values
         [HttpPost]
         public void Post([FromBody] string value)
