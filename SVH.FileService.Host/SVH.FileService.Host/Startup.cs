@@ -43,8 +43,9 @@ namespace SVH.FileService.Host
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSingleton<IFileSystem, FileSystem>();
-            services.AddSingleton<IFileSystemStorage, FileSystemStorage>();
+            services.AddSingleton<IStorage, FileSystemStorage>();
             services.AddTransient<IFileService, Core.Services.FileService>();
+            services.AddTransient<IPreviewService, PreviewService>();
 
             services.AddEntityFrameworkNpgsql().AddDbContext<FileServiceContext>()
                 .BuildServiceProvider();

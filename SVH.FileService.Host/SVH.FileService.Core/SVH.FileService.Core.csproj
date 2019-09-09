@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="6.0.23" />
+    <PackageReference Include="Xabe.FFMpeg" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>

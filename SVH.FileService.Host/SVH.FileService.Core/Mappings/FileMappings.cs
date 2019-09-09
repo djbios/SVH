@@ -20,6 +20,11 @@ namespace SVH.FileService.Core.Mappings
             Mapper = config.CreateMapper();
         }
 
+        public static FileDto ToDto(this FileDbModel db)
+        {
+            return Mapper.Map<FileDto>(db);
+        }
+
         public static ICollection<FileDto> ToDtoCollection(this ICollection<FileDbModel> dbModels, string rootToRemove)
         {
             return Mapper.Map<ICollection<FileDto>>(dbModels).Select(f=>

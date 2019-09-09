@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,12 +16,10 @@ namespace SVH.FileService.Core.Services
     public class FileService : IFileService
     {
         private readonly FileServiceContext _context;
-        private readonly IFileSystemStorage _storage;
+        private readonly IStorage _storage;
         private readonly FileServiceSettings _settings;
         
-        private string SourcesPath => $"{_settings.MediaPath}/sources";
-        
-        public FileService(FileServiceContext context, IFileSystemStorage storage, IOptions<FileServiceSettings> opts)
+        public FileService(FileServiceContext context, IStorage storage, IOptions<FileServiceSettings> opts)
         {
             _context = context;
             _storage = storage;
@@ -34,7 +30,7 @@ namespace SVH.FileService.Core.Services
         {
             if (rescan)
                 await Rescan();
-            return _context.Files.ToList().ToDtoCollection(SourcesPath);
+            return _context.Files.ToList().ToDtoCollection(await _storage.GetPath("", "sources"));
         }
 
         public async Task<string> GetFileName(Guid id)
@@ -45,8 +41,7 @@ namespace SVH.FileService.Core.Services
 
         private async Task Rescan()
         {
-            
-            var paths = await _storage.ScanDirectory(SourcesPath);
+            var paths = await _storage.ScanBucket("sources");
             foreach (var path in paths)
             {
                 var existent = await _context.Files.Where(f => f.FileName == path).FirstOrDefaultAsync();

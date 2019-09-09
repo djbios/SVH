@@ -14,10 +14,12 @@ namespace SVH.FileService.Host.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IFileService _fileService;
+        private readonly IPreviewService _previewService;
 
-        public FilesController(IFileService fileService)
+        public FilesController(IFileService fileService, IPreviewService previewService)
         {
             _fileService = fileService;
+            _previewService = previewService;
         }
         
         [HttpGet]
@@ -38,29 +40,13 @@ namespace SVH.FileService.Host.Controllers
         }
         
         [HttpGet("{id}/preview")]
+        [ProducesResponseType(typeof(FileDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult> GetPreview(Guid id)
         {
-            var physicalPath = await _fileService.GetFileName(id);
-            return PhysicalFile(physicalPath, "video/mp4", "video.mp4");
-        }
-        
-        //todo get preview, get gif, get in format, convert in format, download torrent in path, live in format
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var res = await _previewService.GenerateFilePreview(id);
+            return Ok(res);
         }
     }
 }
