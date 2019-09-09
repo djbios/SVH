@@ -43,6 +43,7 @@ namespace SVH.FileService.Core.Services
                 FileName = previewPath,
                 FileId = Guid.NewGuid()
             });
+
             return result.Entity.ToDto();
         }
 
