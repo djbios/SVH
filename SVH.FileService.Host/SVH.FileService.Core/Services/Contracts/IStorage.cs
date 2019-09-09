@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace SVH.FileService.Core.Services.Contracts
 {
-    public interface IFileSystemStorage
+    public interface IStorage
     {
         Task<ICollection<string>> ScanDirectory(string path);
 
-        Task<Stream> GetFileContent(string path);
+        Task<Stream> GetFilePath(string path);
     }
 }

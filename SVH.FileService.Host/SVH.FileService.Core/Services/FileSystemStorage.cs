@@ -7,7 +7,7 @@ using SVH.FileService.Core.Services.Contracts;
 
 namespace SVH.FileService.Core.Services
 {
-    public class FileSystemStorage : IFileSystemStorage
+    public class FileSystemStorage : IStorage
     {
         private readonly IFileSystem _fileSystem;
 
@@ -26,7 +26,7 @@ namespace SVH.FileService.Core.Services
             return result;
         }
 
-        public async Task<Stream> GetFileContent(string path)
+        public async Task<Stream> GetFilePath(string path)
         {
             return await Task.FromResult(File.OpenRead(path));
         }
