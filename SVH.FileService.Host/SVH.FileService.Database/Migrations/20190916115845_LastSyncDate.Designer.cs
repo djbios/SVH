@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SVH.FileService.Database;
@@ -9,9 +10,10 @@ using SVH.FileService.Database;
 namespace SVH.FileService.Database.Migrations
 {
     [DbContext(typeof(FileServiceContext))]
-    partial class FileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20190916115845_LastSyncDate")]
+    partial class LastSyncDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

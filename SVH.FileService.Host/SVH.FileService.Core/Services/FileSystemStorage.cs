@@ -29,9 +29,9 @@ namespace SVH.FileService.Core.Services
             return result;
         }
 
-        public Task<string> GetPath(string fileName, string bucketName = "")
+        public Task<string> GeneratePath(string filename)
         {
-           return Task.FromResult(Path.Combine(Root, bucketName, fileName));
+            return Task.FromResult(Path.Combine(Root, filename));
         }
     }
 }

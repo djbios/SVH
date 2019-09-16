@@ -4,8 +4,10 @@ namespace SVH.FileService.Database.Models
 {
     public class FileDbModel
     {
-        public FileDbModel()
+        public FileDbModel(string fileName)
         {
+            FileName = fileName;
+            FileId = Guid.NewGuid();
             UploadDate = DateTimeOffset.Now;
         }
 
@@ -16,5 +18,7 @@ namespace SVH.FileService.Database.Models
         public string FileName { get; set; }
 
         public DateTimeOffset UploadDate { get; private set; }
+
+        public DateTimeOffset LastSyncDate { get; set; }
     }
 }

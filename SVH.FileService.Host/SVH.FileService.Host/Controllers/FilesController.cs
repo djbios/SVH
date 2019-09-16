@@ -14,12 +14,12 @@ namespace SVH.FileService.Host.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IFileService _fileService;
-        private readonly IPreviewService _previewService;
+        private readonly IConversionService _conversionService;
 
-        public FilesController(IFileService fileService, IPreviewService previewService)
+        public FilesController(IFileService fileService, IConversionService conversionService)
         {
             _fileService = fileService;
-            _previewService = previewService;
+            _conversionService = conversionService;
         }
         
         [HttpGet]
@@ -37,16 +37,6 @@ namespace SVH.FileService.Host.Controllers
         {
             var physicalPath = await _fileService.GetFileName(id);
             return PhysicalFile(physicalPath, "video/mp4", "video.mp4");
-        }
-        
-        [HttpGet("{id}/preview")]
-        [ProducesResponseType(typeof(FileDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult> GetPreview(Guid id)
-        {
-            var res = await _previewService.GenerateFilePreview(id);
-            return Ok(res);
         }
     }
 }

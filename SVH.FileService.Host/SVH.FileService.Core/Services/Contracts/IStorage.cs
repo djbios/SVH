@@ -9,6 +9,6 @@ namespace SVH.FileService.Core.Services.Contracts
     {
         Task<ICollection<string>> ScanBucket(string path);
 
-        Task<string> GetPath(string fileName, string bucketName = "");
+        Task<string> GeneratePath(string filename);
     }
 }
