@@ -33,7 +33,7 @@ namespace SVH.FileService.Core.Services
             if (format == VideoFormat.preview)
                 newFileId = await GenerateFilePreview(videoFileId);
             else if (format == VideoFormat.gif)
-                throw new NotImplementedException();
+                newFileId = await GenerateFileGif(videoFileId);
             else
             {
                 var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
@@ -75,6 +75,19 @@ namespace SVH.FileService.Core.Services
                 if (avgColor.Item1 + avgColor.Item2 + avgColor.Item3 > 20) //todo
                     break;
             }
+
+            var result = _context.Files.Add(new FileDbModel(previewPath)).Entity;
+            await _context.SaveChangesAsync();
+            return result.FileId;
+        }
+
+        private async Task<Guid> GenerateFileGif(Guid videoFileId)
+        {
+            var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
+                       ?? throw new FileNotFoundException();
+            var previewPath = await _storage.GeneratePath($"{file.FileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}.gif");
+
+            await Conversion.ToGif(file.FileName, previewPath, 0).Start();
 
             var result = _context.Files.Add(new FileDbModel(previewPath)).Entity;
             await _context.SaveChangesAsync();
