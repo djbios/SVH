@@ -47,6 +47,7 @@ namespace SVH.FileService.Host
             services.AddSingleton<IStorage, FileSystemStorage>();
             services.AddTransient<IFileService, Core.Services.FileService>();
             services.AddTransient<IConversionService, ConversionService>();
+            services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
             services.AddEntityFrameworkNpgsql().AddDbContext<FileServiceContext>()
                 .BuildServiceProvider();
 
