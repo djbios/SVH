@@ -88,8 +88,8 @@ services:
     build:
       context: ../
       dockerfile: docker/fileservice/Dockerfile
-   # volumes:
-    #- media:/www/svh/media/
+    volumes:
+    - media:/www/svh/media/
     environment:
         DatabaseSettings__ConnectionString: Host=postgres;Port=5432;Database=svhFiles;Username=svh;
         RabbitSettings__Host: rabbit

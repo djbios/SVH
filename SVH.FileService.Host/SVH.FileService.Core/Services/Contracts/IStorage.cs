@@ -10,5 +10,7 @@ namespace SVH.FileService.Core.Services.Contracts
         Task<ICollection<string>> ScanBucket(string path);
 
         Task<string> GeneratePath(string filename);
+
+        Task Move(string source, string destination);
     }
 }

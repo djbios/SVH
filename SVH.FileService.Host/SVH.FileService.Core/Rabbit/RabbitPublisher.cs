@@ -18,15 +18,12 @@ namespace SVH.FileService.Core.Rabbit
 
         private readonly IConnection _connection;
 
-        private readonly IServiceProvider _serviceProvider;
-
         private readonly RabbitSettings _settings;
 
-        public RabbitPublisher(IOptions<RabbitSettings> options, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+        public RabbitPublisher(IOptions<RabbitSettings> options, ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger<RabbitConsumer>();
+            _logger = loggerFactory.CreateLogger<RabbitPublisher>();
 
-            _serviceProvider = serviceProvider;
             _settings = options.Value;
 
             var factory = new ConnectionFactory
@@ -46,7 +43,7 @@ namespace SVH.FileService.Core.Rabbit
             _channel.QueueDeclare(_settings.Queue, false, false, false, null);
             }
 
-        public void Publish<T>(object message)
+        public void Publish<T>(T message)
         {
             if (message == null)
             {

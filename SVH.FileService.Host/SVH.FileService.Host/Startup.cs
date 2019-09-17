@@ -43,19 +43,21 @@ namespace SVH.FileService.Host
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.Configure<FileServiceSettings>(Configuration.GetSection(nameof(FileServiceSettings)));
+            services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
+            services.Configure<RabbitSettings>(Configuration.GetSection(nameof(RabbitSettings)));
+
+
             services.AddSingleton<IFileSystem, FileSystem>();
             services.AddSingleton<IStorage, FileSystemStorage>();
             services.AddTransient<IFileService, Core.Services.FileService>();
             services.AddTransient<IConversionService, ConversionService>();
-            services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
             services.AddEntityFrameworkNpgsql().AddDbContext<FileServiceContext>()
                 .BuildServiceProvider();
 
 
-            services.Configure<FileServiceSettings>(Configuration.GetSection(nameof(FileServiceSettings)));
             services.AddHostedService<RabbitConsumer>();
             services.AddSingleton<RabbitPublisher>();
-            services.Configure<RabbitSettings>(Configuration.GetSection(nameof(RabbitSettings)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

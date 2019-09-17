@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -20,15 +21,13 @@ namespace SVH.FileService.Core.Services
     {
         private readonly FileServiceContext _context;
         private readonly IStorage _storage;
-        private readonly FileServiceSettings _settings;
         private readonly RabbitPublisher _rabbitPublisher;
         
-        public FileService(FileServiceContext context, IStorage storage, IOptions<FileServiceSettings> opts, RabbitPublisher rabbitPublisher)
+        public FileService(FileServiceContext context, IStorage storage, RabbitPublisher rabbitPublisher)
         {
             _context = context;
             _storage = storage;
             _rabbitPublisher = rabbitPublisher;
-            _settings = opts.Value;
         }
 
         public async Task<ICollection<FileDto>> GetFiles(bool rescan)
@@ -53,11 +52,29 @@ namespace SVH.FileService.Core.Services
             return file.FileName;
         }
 
+        public async Task Move(string source, string destination)
+        {
+            await _storage.Move(source, destination);
+            var affected = _context.Files.Where(f => f.FileName.Contains(source));
+            foreach (var file in affected)
+            {
+                file.FileName = file.FileName.Replace(source, destination);
+            }
+
+            var totalCount = await _context.Files.CountAsync();
+            await _context.SaveChangesAsync();
+            _rabbitPublisher.Publish(new SynchronizedMessage()
+            {
+                Added = 0,
+                Deleted = 0,
+                TotalNow = totalCount
+            });
+        }
+
         private async Task<(int added, int deleted, int total)> Rescan()
         {
             var now = DateTimeOffset.UtcNow;
             int added = 0;
-            int deleted = 0;
             int total = 0;
             var paths = await _storage.ScanBucket("sources");
             foreach (var path in paths)
@@ -65,8 +82,7 @@ namespace SVH.FileService.Core.Services
                 var existent = await _context.Files.Where(f => f.FileName == path).FirstOrDefaultAsync();
                 if (existent == null)
                 {
-                    var file = new FileDbModel(path);
-                    file.LastSyncDate = now;
+                    var file = new FileDbModel(path) { LastSyncDate = now };
                     await _context.Files.AddAsync(file);
                     added++;
                 }
@@ -79,7 +95,7 @@ namespace SVH.FileService.Core.Services
             
             await _context.SaveChangesAsync();
             var old = _context.Files.Where(f => f.LastSyncDate < now);
-            deleted = old.Delete();
+            var deleted = old.Delete();
             return (added, deleted, total);
         }
     }

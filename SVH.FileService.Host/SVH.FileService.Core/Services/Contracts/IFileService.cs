@@ -11,5 +11,7 @@ namespace SVH.FileService.Core.Services.Contracts
         Task<ICollection<FileDto>> GetFiles(bool rescan);
 
         Task<string> GetFileName(Guid id);
+
+        Task Move(string source, string destination);
     }
 }

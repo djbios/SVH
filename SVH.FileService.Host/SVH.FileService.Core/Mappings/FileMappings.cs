@@ -27,7 +27,7 @@ namespace SVH.FileService.Core.Mappings
 
         public static ICollection<FileDto> ToDtoCollection(this ICollection<FileDbModel> dbModels, string rootToRemove)
         {
-            return Mapper.Map<ICollection<FileDto>>(dbModels).Select(f=>
+            return Mapper.Map<ICollection<FileDto>>(dbModels).Select(f =>
             {
                 f.FileName = f.FileName.Replace(rootToRemove, "");
                 return f;

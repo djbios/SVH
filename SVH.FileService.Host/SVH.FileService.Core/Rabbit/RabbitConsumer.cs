@@ -100,19 +100,36 @@ namespace SVH.FileService.Core.Rabbit
 
         private async Task HandleMessage(BasicDeliverEventArgs ea)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            var message = GetMessageObject(ea);
+
+            if (message is VideoConvertTaskMessage vcm)
             {
-                var conversionService =
-                    scope.ServiceProvider
-                        .GetRequiredService<IConversionService>();
-
-
-                var message = GetMessageObject(ea);
-                if (message is VideoConvertTaskMessage vcm)
+                using (var scope = _serviceProvider.CreateScope())
                 {
+                    var conversionService =
+                        scope.ServiceProvider
+                            .GetRequiredService<IConversionService>();
+
                     await conversionService.ConvertInFormat(vcm.FileId, vcm.Format);
                 }
             }
+
+            if (message is MoveTaskMessage mtm)
+            {
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var fileService =
+                        scope.ServiceProvider
+                            .GetRequiredService<IFileService>();
+                    await fileService.Move(mtm.Source, mtm.Target);
+                }
+            }
+
+            if (message is TorrentTaskMessage ttm)
+            {
+                //todo
+            }
+            
         }
 
         private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e)

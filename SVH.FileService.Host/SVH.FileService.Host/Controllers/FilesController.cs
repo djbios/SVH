@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +13,10 @@ namespace SVH.FileService.Host.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IFileService _fileService;
-        private readonly IConversionService _conversionService;
 
-        public FilesController(IFileService fileService, IConversionService conversionService)
+        public FilesController(IFileService fileService)
         {
             _fileService = fileService;
-            _conversionService = conversionService;
         }
         
         [HttpGet]
