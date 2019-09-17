@@ -16,7 +16,7 @@ VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'a
 
 @app.task
 def update_library():
-    folder_traverser()
+    folder_traverser_fileservice()
     check_deleted_videosources()
     update_video_sizes()  # todo this should be in VideFolder/Videosource model lazyattr
     update_video_previews()
@@ -54,6 +54,32 @@ def folder_traverser():
 
         folder.save()
 
+
+def folder_traverser_fileservice():
+    from svh.proxy.account import get_files
+    for f in get_files():
+        filepath = f.get('fileName').strip('/').strip('\\').replace(settings.FILESERVICE_SOURCES_FOLDER, '') # todo remove start slash at fileservice and make path unix like
+        dirpath = os.path.dirname(filepath)
+        folder = VideoFolder.objects.all_with_deleted().filter(path=dirpath).first()
+        if not folder:
+            folder = VideoFolder(path=dirpath)
+            parent_path = os.path.dirname(dirpath)
+            folder.parent = VideoFolder.objects.all_with_deleted().filter(path=parent_path).first()
+            folder.save()
+
+        if os.path.splitext(filepath)[1] in ['.%s' % ex for ex in
+                                      VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
+            hash = f.get('fileId')
+            try:
+                obj = VideoSource.objects.get_with_deleted(hash=hash)
+                obj.deleted = False
+                obj.path = filepath
+                obj.folder = folder
+                obj.save()
+            except VideoSource.DoesNotExist:
+                vs = VideoSource(path=filepath, hash=hash, folder=folder)
+                vs.save()
+            print(filepath, hash)
 
 @timeit
 def check_deleted_videosources():

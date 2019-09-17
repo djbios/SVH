@@ -147,5 +147,9 @@ CELERY_BROKER_URL = 'amqp://rabbit'
 TORRENT_SERVICE_URL = 'http://torrent:8080'
 X264_PRESET = 'veryfast'
 
+# File service settings
+FILESERVICE_URL = 'http://localhost:5000'
+FILESERVICE_SOURCES_FOLDER = 'sources'
+
 from svh.settings_local import *
 SOURCE_VIDEOS_PATH = os.path.join(MEDIA_ROOT, 'sources')
