@@ -16,6 +16,9 @@ Feature list:
 - Direct torrent downloads into the folders (WIP)
 - Distriburted architecture. You can serve main site on hosting, and videos can be stored on any else storage.
 
+Now we have Telegram channel with all news about the project:
+https://t.me/svhdev
+
 Powered by:
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
