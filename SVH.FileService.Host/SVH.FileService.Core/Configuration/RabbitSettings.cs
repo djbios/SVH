@@ -1,4 +1,6 @@
-﻿namespace SVH.FileService.Core.Configuration
+﻿using System.Collections.Generic;
+
+namespace SVH.FileService.Core.Configuration
 {
     public class RabbitSettings
     {
@@ -10,11 +12,7 @@
 
         public int Port { get; set; }
 
-        public string Queue { get; set; }
-
-        public string Exchange { get; set; }
-
-        public string RoutingKey { get; set; }
+        public Dictionary<string, RabbitEndpoint> RabbitEndpoints { get; set; }
 
         public string VirtualHost { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ namespace SVH.FileService.Host.Controllers
         public async Task<ActionResult> Get(Guid id)
         {
             var physicalPath = await _fileService.GetFileName(id);
-            return PhysicalFile(physicalPath, "video/mp4", "video.mp4");
+            return PhysicalFile(physicalPath, "application/octet-stream");
         }
     }
 }

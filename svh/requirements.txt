@@ -1,3 +1,4 @@
+requests
 django
 uwsgi
 ipython
@@ -12,3 +13,4 @@ moviepy
 pyyaml
 qbittorrent-api
 ffmpeg-python
+pika

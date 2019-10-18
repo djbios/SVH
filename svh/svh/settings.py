@@ -149,7 +149,30 @@ X264_PRESET = 'veryfast'
 
 # File service settings
 FILESERVICE_URL = 'http://localhost:5000'
-FILESERVICE_SOURCES_FOLDER = 'sources'
+FILESERVICE_SOURCES_FOLDER = 'sources/'
 
 from svh.settings_local import *
 SOURCE_VIDEOS_PATH = os.path.join(MEDIA_ROOT, 'sources')
+
+RABBIT_SETTINGS = {
+    "Host": "localhost",
+    "UserName": "guest",
+    "Password": "guest",
+    "Port": 5672,
+    "VirtualHost": "/",
+    "RabbitEndpoints":
+    {
+      "Tasks": {
+        "Exchange": "svh.tasks.v1",
+        "ExchangeType": "fanout",
+        "Queue": "svh.tasks.v1.backend.queue",
+        "RoutingKey": "*"
+      },
+      "Events": {
+        "Exchange": "svh.events.v1",
+        "ExchangeType": "fanout",
+        "Queue": "svh.events.v1.backend.queue",
+        "RoutingKey": "*"
+      }
+    }
+  }

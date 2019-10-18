@@ -28,9 +28,11 @@ namespace SVH.FileService.Core.Services
             List<string> result = _fileSystem.Directory.EnumerateFiles(path).ToList();
             foreach (var directory in _fileSystem.Directory.EnumerateDirectories(path))
             {
-                result.AddRange(await ScanBucket(directory));
+                var subs = await ScanBucket(directory);
+                result.AddRange(subs);
             }
-            return result;
+
+            return result.UnixifyPaths(_root);
         }
 
         public Task<string> GeneratePath(string filename)
@@ -54,6 +56,11 @@ namespace SVH.FileService.Core.Services
                 throw new IncorrectPathException("source");
 
             return Task.CompletedTask;
+        }
+
+        public Task<string> GetFilePath(string fileName)
+        {
+            return Task.FromResult(Path.Combine(_root, fileName));
         }
     }
 }

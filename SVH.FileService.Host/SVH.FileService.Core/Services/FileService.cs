@@ -34,12 +34,12 @@ namespace SVH.FileService.Core.Services
         {
             if (rescan)
             {
-                var results = await Rescan();
-                _rabbitPublisher.Publish<SynchronizedMessage>(new SynchronizedMessage
+                var (added, deleted, total) = await Rescan();
+                _rabbitPublisher.Publish<SynchronizedEventMessage>(new SynchronizedEventMessage
                 {
-                    TotalNow = results.total,
-                    Added = results.added,
-                    Deleted = results.deleted
+                    TotalNow = total,
+                    Added = added,
+                    Deleted = deleted
                 });
             }
 
@@ -49,7 +49,7 @@ namespace SVH.FileService.Core.Services
         public async Task<string> GetFileName(Guid id)
         {
             var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == id);
-            return file.FileName;
+            return await _storage.GetFilePath(file.FileName);
         }
 
         public async Task Move(string source, string destination)
@@ -63,7 +63,7 @@ namespace SVH.FileService.Core.Services
 
             var totalCount = await _context.Files.CountAsync();
             await _context.SaveChangesAsync();
-            _rabbitPublisher.Publish(new SynchronizedMessage()
+            _rabbitPublisher.Publish<SynchronizedEventMessage>(new SynchronizedEventMessage
             {
                 Added = 0,
                 Deleted = 0,

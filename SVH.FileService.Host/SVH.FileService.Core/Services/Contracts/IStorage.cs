@@ -12,5 +12,7 @@ namespace SVH.FileService.Core.Services.Contracts
         Task<string> GeneratePath(string filename);
 
         Task Move(string source, string destination);
+
+        Task<string> GetFilePath(string fileName);
     }
 }

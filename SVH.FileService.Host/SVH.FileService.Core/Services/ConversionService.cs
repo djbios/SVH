@@ -38,10 +38,10 @@ namespace SVH.FileService.Core.Services
             {
                 var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
                            ?? throw new FileNotFoundException();
-
+                var path = await _storage.GetFilePath(file.FileName);
                 var newFilePath =
                     await _storage.GeneratePath($"{videoFileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}_{format}.mp4");
-                IMediaInfo mediaInfo = await MediaInfo.Get(file.FileName);
+                IMediaInfo mediaInfo = await MediaInfo.Get(path);
                 IStream videoStream = mediaInfo.VideoStreams.FirstOrDefault().SetFormat(format);
 
                 await Conversion.New().AddStream(videoStream)
@@ -52,7 +52,7 @@ namespace SVH.FileService.Core.Services
                 newFileId = newFile.Entity.FileId;
             }
 
-            _rabbitPublisher.Publish<VideoConvertedMessage>(new VideoConvertedMessage
+            _rabbitPublisher.Publish<VideoConvertedEventMessage>(new VideoConvertedEventMessage
             {
                 Format = format,
                 SourceId = videoFileId,
@@ -64,12 +64,13 @@ namespace SVH.FileService.Core.Services
         {
             var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
                        ?? throw new FileNotFoundException();
+            var path = await _storage.GetFilePath(file.FileName);
             var previewPath = await _storage.GeneratePath($"{file.FileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}.jpg");
 
             Random rnd = new Random();
             for (int i = 0; i < 20; i++)
             {
-                await Conversion.Snapshot(file.FileName, previewPath, TimeSpan.FromSeconds(rnd.Next(2, 20))).Start();
+                await Conversion.Snapshot(path, previewPath, TimeSpan.FromSeconds(rnd.Next(2, 20))).Start();
                     
                 var avgColor = await GetAverageColor(previewPath);
                 if (avgColor.Item1 + avgColor.Item2 + avgColor.Item3 > 20) //todo
@@ -85,9 +86,10 @@ namespace SVH.FileService.Core.Services
         {
             var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
                        ?? throw new FileNotFoundException();
+            var path = await _storage.GetFilePath(file.FileName);
             var previewPath = await _storage.GeneratePath($"{file.FileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}.gif");
 
-            await Conversion.ToGif(file.FileName, previewPath, 0).Start();
+            await Conversion.ToGif(path, previewPath, 0).Start();
 
             var result = _context.Files.Add(new FileDbModel(previewPath)).Entity;
             await _context.SaveChangesAsync();

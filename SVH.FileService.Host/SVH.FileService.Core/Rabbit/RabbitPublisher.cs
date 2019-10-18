@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing;
 using SVH.FileService.Core.Configuration;
+using SVH.FileService.Core.Rabbit.Messages;
 
 namespace SVH.FileService.Core.Rabbit
 {
@@ -38,12 +39,15 @@ namespace SVH.FileService.Core.Rabbit
             _connection = factory.CreateConnection();
 
             _channel = _connection.CreateModel();
-          
-            _channel.ExchangeDeclare(_settings.Exchange, ExchangeType.Topic);
-            _channel.QueueDeclare(_settings.Queue, false, false, false, null);
+            foreach (var ep in _settings.RabbitEndpoints.Values)
+            {
+                _channel.ExchangeDeclare(ep.Exchange, ep.ExchangeType);
             }
 
-        public void Publish<T>(T message)
+            //_channel.QueueDeclare(_settings.Queue, false, false, false, null);
+            }
+
+        public void Publish<T>(MessageBase message)
         {
             if (message == null)
             {
@@ -60,8 +64,8 @@ namespace SVH.FileService.Core.Rabbit
                     { AppConstants.RabbitMessageTypeHeaderName, typeof(T).Name }
                 }
             };
-            
-            _channel.BasicPublish(_settings.Exchange, _settings.RoutingKey, props, bytesMessage);
+            var endpoint = _settings.RabbitEndpoints[message.TargetEndpoint];
+            _channel.BasicPublish(endpoint.Exchange, endpoint.RoutingKey, props, bytesMessage);
             _logger.LogInformation($"Message sent {jsonMessage}");
         }
 

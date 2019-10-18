@@ -17,55 +17,15 @@ VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'a
 @app.task
 def update_library():
     folder_traverser_fileservice()
-    check_deleted_videosources()
-    update_video_sizes()  # todo this should be in VideFolder/Videosource model lazyattr
     update_video_previews()
 
 
-@timeit
-def folder_traverser():
-    for path, dirs, files in os.walk(settings.SOURCE_VIDEOS_PATH, followlinks=True):
-        folder = VideoFolder.objects.all_with_deleted().filter(path=path).first()
-        if not folder:
-            folder = VideoFolder(path=path)
-            parent_path = os.path.abspath(os.path.join(path, os.pardir))
-            folder.parent = VideoFolder.objects.all_with_deleted().filter(path=parent_path).first()  # Get parent object or none
-
-        if settings.DESCRIPTION_FILENAME in files:
-            root_yaml = yaml.load(open(os.path.join(path, settings.DESCRIPTION_FILENAME)))
-            folder.fill(root_yaml)
-
-        folder.save()
-
-        for f in files:
-            if os.path.splitext(f)[1] in ['.%s' % ex for ex in VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
-                filepath = os.path.join(path, f)
-                hash = imohash.hashfile(filepath, hexdigest=True)
-                try:
-                    obj = VideoSource.objects.get_with_deleted(hash=hash)
-                    obj.deleted = False
-                    obj.path = filepath
-                    obj.folder = folder
-                    obj.save()
-                except VideoSource.DoesNotExist:
-                    vs = VideoSource(path=filepath, hash=hash, folder=folder)
-                    vs.save()
-                print(filepath, hash)
-
-        folder.save()
-
-
 def folder_traverser_fileservice():
-    from svh.proxy.account import get_files
+    from svh.fileservice.proxy import get_files
     for f in get_files():
-        filepath = f.get('fileName').strip('/').strip('\\').replace(settings.FILESERVICE_SOURCES_FOLDER, '') # todo remove start slash at fileservice and make path unix like
+        filepath = f.get('fileName').replace(settings.FILESERVICE_SOURCES_FOLDER, '')
         dirpath = os.path.dirname(filepath)
-        folder = VideoFolder.objects.all_with_deleted().filter(path=dirpath).first()
-        if not folder:
-            folder = VideoFolder(path=dirpath)
-            parent_path = os.path.dirname(dirpath)
-            folder.parent = VideoFolder.objects.all_with_deleted().filter(path=parent_path).first()
-            folder.save()
+        folder = VideoFolder.objects.get_or_create_with_hierarchy(dirpath)
 
         if os.path.splitext(filepath)[1] in ['.%s' % ex for ex in
                                       VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
@@ -80,31 +40,6 @@ def folder_traverser_fileservice():
                 vs = VideoSource(path=filepath, hash=hash, folder=folder)
                 vs.save()
             print(filepath, hash)
-
-@timeit
-def check_deleted_videosources():
-    for vs in VideoSource.objects.filter(deleted=False):
-        if not os.path.isfile(vs.path):
-            vs.deleted=True
-            print(vs.path,' was deleted.')
-            vs.save()
-
-    for vf in VideoFolder.objects.all():
-        if not os.path.isdir(vf.path):
-            vf.deleted = True
-            print(vf.path, ' was deleted.')
-            vf.save()
-
-
-@timeit
-def update_video_sizes():
-    for vs in VideoSource.objects.all():
-        vs.sizeBytes = os.stat(vs.path).st_size
-        vs.save()
-
-    for vf in VideoFile.objects.all():
-        vf.sizeBytes = os.stat(vf.path).st_size
-        vf.save()
 
 
 @timeit

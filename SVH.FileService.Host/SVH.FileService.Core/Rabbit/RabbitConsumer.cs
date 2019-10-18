@@ -47,15 +47,18 @@ namespace SVH.FileService.Core.Rabbit
             // create channel  
             _channel = _connection.CreateModel();
 
-            _channel.ExchangeDeclare(_settings.Exchange, ExchangeType.Topic);
-            _channel.QueueDeclare(_settings.Queue, false, false, false, null);
-            _channel.QueueBind(_settings.Queue, _settings.Exchange, _settings.RoutingKey, null);
-            _channel.BasicQos(0, 1, false);
+            foreach (var ep in _settings.RabbitEndpoints.Values)
+            {
+                _channel.ExchangeDeclare(ep.Exchange, ep.ExchangeType);
+                _channel.QueueDeclare(ep.Queue, false, false, false, null);
+                _channel.QueueBind(ep.Queue, ep.Exchange, ep.RoutingKey);
+                _channel.BasicQos(0, 1, false);
+            }
 
             _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
 
@@ -77,16 +80,24 @@ namespace SVH.FileService.Core.Rabbit
             consumer.Registered += OnConsumerRegistered;
             consumer.Unregistered += OnConsumerUnregistered;
             consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
+            foreach (var ep in _settings.RabbitEndpoints.Values)
+            {
+                _channel.BasicConsume(ep.Queue, false, consumer);
+            }
 
-            _channel.BasicConsume(_settings.Queue, false, consumer);
+            return Task.CompletedTask;
         }
 
-        private object GetMessageObject(BasicDeliverEventArgs ea)
+        private MessageBase GetMessageObject(BasicDeliverEventArgs ea)
         {
             var content = System.Text.Encoding.UTF8.GetString(ea.Body);
             _logger.LogInformation($"consumer received {content}");
 
-            ea.BasicProperties.Headers.TryGetValue(AppConstants.RabbitMessageTypeHeaderName, out object typeBytes);
+            var typeHeaderExists =
+                ea.BasicProperties.Headers.TryGetValue(AppConstants.RabbitMessageTypeHeaderName, out object typeBytes);
+            if (!typeHeaderExists)
+                return null;
+
             var typeName = System.Text.Encoding.UTF8.GetString((byte[]) typeBytes);
 
             Type messageType = Type.GetType($"SVH.FileService.Core.Rabbit.Messages.{typeName}, SVH.FileService.Core");
@@ -94,8 +105,9 @@ namespace SVH.FileService.Core.Rabbit
             MethodInfo method = typeof(JsonConvert).GetMethods()
                 .First(m => m.IsGenericMethod && m.Name == "DeserializeObject");
             MethodInfo genericMethod = method.MakeGenericMethod(messageType);
-            var message = genericMethod.Invoke(null, new object[] { content });
+            var message = (MessageBase) genericMethod.Invoke(null, new object[] { content });
             return message;
+            
         }
 
         private async Task HandleMessage(BasicDeliverEventArgs ea)
