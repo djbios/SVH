@@ -1,11 +1,9 @@
 from django.conf import settings
 import os
-from django.core.files.base import ContentFile
+from django.dispatch import receiver
 from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview, Gif
-import imohash
-import yaml
-import cv2
-import random
+
+from svh.rabbit.signals import synchronized_signal, video_converted_signal
 from svh.utils import timeit, log_exception
 import io
 from svh.celery import app
@@ -14,10 +12,10 @@ from svh.ffmpeg_helper import convert_video_to_format
 VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi', 'mov', 'wmv', 'yuv', 'rm', 'mp4', 'm4p',
                     'mpg', 'mpeg', 'mp2', 'mpv', 'mpe', 'm4v', '3gp', 'mts']
 
-@app.task
-def update_library():
+
+@receiver(synchronized_signal)
+def update_library(sender, **kwargs):
     folder_traverser_fileservice()
-    update_video_previews()
 
 
 def folder_traverser_fileservice():
@@ -41,66 +39,6 @@ def folder_traverser_fileservice():
                 vs.save()
             print(filepath, hash)
 
-
-@timeit
-def update_video_previews():
-    for vs in VideoSource.objects.all():
-        if not vs.preview_set.exists():
-            generate_preview(vs)
-
-@timeit
-def generate_preview(videosource):
-    def get_random_frames(video_path, count=1):  # todo slow
-        cap = cv2.VideoCapture(video_path)
-        video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
-        targets = random.sample(range(min(video_length, 25 * 20)), count)
-        frames = []
-        if cap.isOpened() and video_length > 0:
-            i = 0
-            success, image = cap.read()
-            while success and i <= max(targets):
-                success, image = cap.read()
-                if i in targets and image.mean() > 10:
-                    frames.append(image)
-                i += 1
-        return frames
-
-    smallestVideofile = videosource.videofile
-    if smallestVideofile == None:
-        return
-    frames = get_random_frames(smallestVideofile.path, 5)
-    for i, f in enumerate(frames):
-        (h,w,s) = f.shape
-        scale = settings.PREVIEW_HEIGHT / h
-        nh, nw = h*scale, w*scale
-        f = cv2.resize(f, (int(nw), int(nh)))
-        is_success, buffer = cv2.imencode(".jpg", f)
-        io_buf = io.BytesIO(buffer)
-        filename = 'preview_%s_%i.jpg' % (videosource.name, i)
-        pr = Preview()
-        pr.videosource = videosource
-        pr.image.save(filename, io_buf)
-
-
-@log_exception
-@timeit
-def generate_gif(videosource):
-    from moviepy.editor import VideoFileClip
-    smallestVideofile = videosource.videofile
-    if smallestVideofile == None:
-        return
-    filename = '%s.gif' % videosource.id
-    clip = VideoFileClip(smallestVideofile.path)
-    scale = settings.PREVIEW_HEIGHT / clip.size[1]
-    gif = Gif(videosource=videosource)
-    gif.image.save(filename, ContentFile(''))
-    clip.subclip(clip.duration/2, clip.duration/2 + min(clip.duration*0.1, 5)).resize(scale).write_gif(gif.image.path) # todo gif length in settings
-    gif.save()
-
-
-@app.task
-def generate_gif_task(vs_id):
-    generate_gif(VideoSource.objects.get(id=vs_id))
 
 @log_exception
 def download_torrent(magnet, target_path):
@@ -127,3 +65,9 @@ def check_torrents():
     from qbittorrentapi import Client
     client = Client(host=settings.TORRENT_SERVICE_URL, username='admin', password='adminadmin')
     client.torrents.info()
+
+@receiver(video_converted_signal)
+def handle_converted_message(sender, source_file_id, result_file_id, format):
+    source = VideoSource.objects.filter(file_id=)
+    if format == 'preview':
+        pr = Preview()

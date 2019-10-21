@@ -141,7 +141,6 @@ namespace SVH.FileService.Core.Rabbit
             {
                 //todo
             }
-            
         }
 
         private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e)

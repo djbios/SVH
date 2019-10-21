@@ -152,10 +152,9 @@ class VideoFile(models.Model):
 
 class Preview(models.Model): # todo delete file on model deletion
     videosource = models.ForeignKey(VideoSource, on_delete=models.CASCADE)
-    pos_seconds = models.IntegerField(null=True)
-    image = models.ImageField(upload_to='previews')
+    fileId = models.CharField(max_length=2000, unique=False)
 
 
 class Gif(models.Model): # todo delete file on model deletion
     videosource = models.OneToOneField(VideoSource, on_delete=models.CASCADE)
-    image = models.FileField(upload_to='gifs')
+    fileId = models.CharField(max_length=2000, unique=True)
