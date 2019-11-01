@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using SVH.FileService.Core.Configuration;
 using SVH.FileService.Core.Mappings;
 using SVH.FileService.Core.Models;
 using SVH.FileService.Core.Rabbit;

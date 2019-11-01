@@ -1,13 +1,10 @@
 from django.conf import settings
 import os
 from django.dispatch import receiver
-from svh.models import VideoSource, VideoFile, VIDEO_FORMATS, VideoFolder, Preview, Gif
-
+from svh.models import VideoSource, VideoFile, VideoFolder, Preview, Gif
 from svh.rabbit.signals import synchronized_signal, video_converted_signal
-from svh.utils import timeit, log_exception
-import io
+from svh.utils import log_exception
 from svh.celery import app
-from svh.ffmpeg_helper import convert_video_to_format
 
 VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi', 'mov', 'wmv', 'yuv', 'rm', 'mp4', 'm4p',
                     'mpg', 'mpeg', 'mp2', 'mpv', 'mpe', 'm4v', '3gp', 'mts']
@@ -28,15 +25,18 @@ def folder_traverser_fileservice():
         if os.path.splitext(filepath)[1] in ['.%s' % ex for ex in
                                       VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
             hash = f.get('fileId')
+            vs = None
             try:
-                obj = VideoSource.objects.get_with_deleted(hash=hash)
-                obj.deleted = False
-                obj.path = filepath
-                obj.folder = folder
-                obj.save()
+                vs = VideoSource.objects.get_with_deleted(hash=hash)
+                vs.deleted = False
+                vs.path = filepath
+                vs.folder = folder
+                vs.save()
             except VideoSource.DoesNotExist:
                 vs = VideoSource(path=filepath, hash=hash, folder=folder)
                 vs.save()
+            vf = VideoFile(source=vs, fileId=f.get('FileId'), format='source')
+            vf.save()
             print(filepath, hash)
 
 
@@ -48,26 +48,25 @@ def download_torrent(magnet, target_path):
 
 
 @app.task
-def convert_videosource_task(video_source_id, format):
-    vs = VideoSource.objects.get(id=video_source_id)
-    if vs.videofile_set.filter(format=format).exists(): #todo test it
-        print("Video is already converted.")
-
-    vf = VideoFile(source=vs, format=format)
-    vf.path = os.path.join(settings.MEDIA_ROOT, '%s_%s.mp4' % (vs.hash, format))
-    convert_video_to_format(vs.path, vf.path, format)
-    vf.sizeBytes = os.stat(vf.path).st_size
-    vf.save()
-
-
-@app.task
 def check_torrents():
     from qbittorrentapi import Client
     client = Client(host=settings.TORRENT_SERVICE_URL, username='admin', password='adminadmin')
     client.torrents.info()
 
+
 @receiver(video_converted_signal)
-def handle_converted_message(sender, source_file_id, result_file_id, format):
-    source = VideoSource.objects.filter(file_id=)
+def handle_converted_message(sender, source_file_id, result_file_id, format, **kwargs):
+    VideoSource.objects.filter(videofile__fileId=source_file_id).first()
+    source = VideoSource.objects.filter(videofile__fileId=source_file_id) or VideoSource.objects.get(hash=source_file_id)
+    print(format)
     if format == 'preview':
-        pr = Preview()
+        pr = Preview(videosource=source, fileId=result_file_id)
+        pr.save()
+    elif format == 'gif':
+        gif = Gif(videosource=source, fileId=result_file_id)
+        gif.save()
+    else:
+        vf = VideoFile(source=source, format=format, fileId=result_file_id)
+        vf.save()
+    print('Added %s for %s' % (result_file_id, source))
+

@@ -62,5 +62,10 @@ namespace SVH.FileService.Core.Services
         {
             return Task.FromResult(Path.Combine(_root, fileName));
         }
+
+        public void RemoveFile(string path)
+        {
+            _fileSystem.File.Delete(path);
+        }
     }
 }

@@ -3,12 +3,7 @@ from django.db import models
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 import os
-
 from svh.fileservice.proxy import get_file_url, start_conversion
-
-VIDEO_FORMATS = (
-    ('default', '-vcodec libx264'),
-)
 
 BIRTH_PLACES = ('user', 'torrent', 'upload')
 
@@ -118,28 +113,24 @@ class VideoSource(models.Model):
 
     @property
     def preview(self):
-        preview =  self.preview_set.first()
-        if preview:
-            return preview
-        start_conversion(self.hash, 'preview')
+        preview = self.preview_set.first()
+        return preview or start_conversion(self.hash, 'preview')
 
     @property
     def gif_url(self):
-        from svh.tasks import generate_gif_task
         if hasattr(self, 'gif'):
-            return self.gif.image.url
+            return self.gif.url
         else:
-            generate_gif_task.delay(self.id)
+            start_conversion(self.hash, 'gif')
             if self.preview:
-                return self.preview.image.url
+                return self.preview.url
             else:
                 return None  # todo if no preview - return default img
 
 
 class VideoFile(models.Model):
     fileId = models.CharField(max_length=2000, unique=True)
-    sizeBytes = models.IntegerField(null=True)
-    format = models.CharField(max_length=200, choices=VIDEO_FORMATS, default=VIDEO_FORMATS[0])
+    format = models.CharField(max_length=200)
     source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -154,7 +145,15 @@ class Preview(models.Model): # todo delete file on model deletion
     videosource = models.ForeignKey(VideoSource, on_delete=models.CASCADE)
     fileId = models.CharField(max_length=2000, unique=False)
 
+    @property
+    def url(self):
+        return get_file_url(self.fileId)
+
 
 class Gif(models.Model): # todo delete file on model deletion
     videosource = models.OneToOneField(VideoSource, on_delete=models.CASCADE)
     fileId = models.CharField(max_length=2000, unique=True)
+
+    @property
+    def url(self):
+        return get_file_url(self.fileId)

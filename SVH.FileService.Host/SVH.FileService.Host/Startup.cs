@@ -19,6 +19,7 @@ using SVH.FileService.Core.Rabbit;
 using SVH.FileService.Core.Services;
 using SVH.FileService.Core.Services.Contracts;
 using SVH.FileService.Database;
+using Xabe.FFmpeg;
 
 namespace SVH.FileService.Host
 {
@@ -78,6 +79,9 @@ namespace SVH.FileService.Host
 
             app.UseMvc();
             
+            FFmpeg.GetLatestVersion();
+            if (Path.IsPathFullyQualified("C:\\Windows"))
+                FFmpeg.ExecutablesPath = "C:\\Windows";
         }
     }
 }
