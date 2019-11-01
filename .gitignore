@@ -112,3 +112,6 @@ settings_local.py
 #NetCore
 bin/
 obj/
+.tmp
+.TMP
+.exe
