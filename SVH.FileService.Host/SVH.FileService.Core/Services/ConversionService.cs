@@ -11,14 +11,10 @@ using SVH.FileService.Database;
 using SVH.FileService.Database.Models;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Streams;
-using System.Drawing;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.ColorSpaces;
-using SixLabors.ImageSharp.ColorSpaces.Conversion;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using SVH.FileService.Core.Configuration;
 using Xabe.FFmpeg.Enums;
 using Xabe.FFmpeg.Exceptions;
@@ -110,9 +106,9 @@ namespace SVH.FileService.Core.Services
                 _storage.RemoveFile(previewPath);
             }
 
-            var result = _context.Files.Add(new FileDbModel(previewPath)).Entity;
+            var result = _context.Files.Add(new FileDbModel(previewPath));
             await _context.SaveChangesAsync();
-            return result.FileId;
+            return result.Entity.FileId;
         }
 
         private async Task<Guid> GenerateFileGif(Guid videoFileId)
@@ -124,9 +120,9 @@ namespace SVH.FileService.Core.Services
 
             await Conversion.ToGif(path, previewPath, 0).Start();
 
-            var result = _context.Files.Add(new FileDbModel(previewPath)).Entity;
+            var result = _context.Files.Add(new FileDbModel(previewPath));
             await _context.SaveChangesAsync();
-            return result.FileId;
+            return result.Entity.FileId;
         }
 
         private int GetAverageColor(string path)
@@ -137,7 +133,7 @@ namespace SVH.FileService.Core.Services
                 for (int x = 0; x < image.Height; x++)
                     a += image.GetPixelRowSpan(x).ToArray().Average(p => (p.R + p.G + p.B) / 3);
                 a = a / image.Height;
-                return (int)Math.Round(a);
+                return (int) Math.Round(a);
             }
         }
     }
