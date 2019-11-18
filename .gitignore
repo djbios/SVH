@@ -114,5 +114,4 @@ bin/
 obj/
 *.tmp
 *.TMP
-*.tmp
 *.exe

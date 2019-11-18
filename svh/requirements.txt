@@ -5,7 +5,6 @@ ipython
 psycopg2-binary
 imohash
 pillow
-opencv-python
 factory_boy
 django-mptt
 celery

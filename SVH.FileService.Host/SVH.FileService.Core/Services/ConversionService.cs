@@ -84,6 +84,7 @@ namespace SVH.FileService.Core.Services
             Random rnd = new Random();
             for (int i = 0; i < 20; i++)
             {
+                _storage.RemoveFile(previewPath);
                 var targetSec = rnd.Next(1, videoStream.Duration.Seconds);
                 try
                 {

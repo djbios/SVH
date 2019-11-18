@@ -65,7 +65,8 @@ namespace SVH.FileService.Core.Services
 
         public void RemoveFile(string path)
         {
-            _fileSystem.File.Delete(path);
+            if(File.Exists(path))
+                _fileSystem.File.Delete(path);
         }
     }
 }

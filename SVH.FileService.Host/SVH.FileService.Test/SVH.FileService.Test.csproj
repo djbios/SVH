@@ -18,4 +18,8 @@
     <ProjectReference Include="..\SVH.FileService.Core\SVH.FileService.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
