@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace SVH.FileService.Core.Enums
+namespace SVH.FileService.Common.Enums
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum VideoFormat

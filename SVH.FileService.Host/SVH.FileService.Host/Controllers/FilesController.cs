@@ -9,18 +9,20 @@ using SVH.FileService.Core.Services.Contracts;
 
 namespace SVH.FileService.Host.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/files")]
     [ApiController]
     public class FilesController : ControllerBase
     {
         private readonly IFileService _fileService;
+        private readonly IStorage _storage;
 
-        public FilesController(IFileService fileService)
+        public FilesController(IFileService fileService, IStorage storage)
         {
             _fileService = fileService;
+            _storage = storage;
         }
         
-        [HttpGet]
+        [HttpGet()]
         [ProducesResponseType(typeof(ICollection<FileDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -33,8 +35,15 @@ namespace SVH.FileService.Host.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(Guid id)
         {
-            var physicalPath = await _fileService.GetFileName(id);
-            return PhysicalFile(physicalPath, "application/octet-stream");
+            var relativePath = await _fileService.GetFileName(id);
+            return Redirect($"storage?path={relativePath}");
+        }
+
+        [HttpGet("storage/")]
+        public async Task<ActionResult> GetFs(string path)
+        {
+            var fullPath = await _storage.GetFullFilePath(path);
+            return PhysicalFile(fullPath, "application/octet-stream", Path.GetFileName(fullPath));
         }
     }
 }

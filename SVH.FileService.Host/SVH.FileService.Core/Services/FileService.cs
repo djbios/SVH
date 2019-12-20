@@ -46,7 +46,7 @@ namespace SVH.FileService.Core.Services
         public async Task<string> GetFileName(Guid id)
         {
             var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == id);
-            return await _storage.GetFilePath(file.FileName);
+            return file.FileName;
         }
 
         public async Task Move(string source, string destination)

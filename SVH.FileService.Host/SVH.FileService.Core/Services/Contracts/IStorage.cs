@@ -11,7 +11,7 @@ namespace SVH.FileService.Core.Services.Contracts
 
         Task Move(string source, string destination);
 
-        Task<string> GetFilePath(string fileName);
+        Task<string> GetFullFilePath(string fileName);
 
         void RemoveFile(string path);
     }

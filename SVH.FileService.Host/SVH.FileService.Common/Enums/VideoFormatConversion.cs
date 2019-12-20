@@ -2,7 +2,7 @@
 using Xabe.FFmpeg.Enums;
 using Xabe.FFmpeg.Streams;
 
-namespace SVH.FileService.Core.Enums
+namespace SVH.FileService.Common.Enums
 {
     public static class VideoFormatConversion
     {

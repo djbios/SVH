@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SVH.FileService.Core.Enums;
+using SVH.FileService.Common.Enums;
 
 namespace SVH.FileService.Core.Rabbit.Messages
 {

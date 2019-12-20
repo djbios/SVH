@@ -11,6 +11,8 @@ namespace SVH.FileService.Database
 
         public virtual DbSet<FileDbModel> Files { get; set; }
 
+        public virtual DbSet<ConversionDbModel> Conversions { get; set; }
+
         public FileServiceContext(DbContextOptions dbContextOptions, IOptions<DatabaseSettings> opts)
             : base(dbContextOptions)
         {
@@ -19,7 +21,7 @@ namespace SVH.FileService.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(_connectionString);
+
         }
 
         public void InitData()
