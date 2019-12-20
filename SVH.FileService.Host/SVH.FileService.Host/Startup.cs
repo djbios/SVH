@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SVH.FileService.Core.Configuration;
 using SVH.FileService.Core.Rabbit;
@@ -42,7 +36,7 @@ namespace SVH.FileService.Host
                     Version = "v1"
                 }));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.Configure<FileServiceSettings>(Configuration.GetSection(nameof(FileServiceSettings)));
             services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
@@ -53,8 +47,9 @@ namespace SVH.FileService.Host
             services.AddSingleton<IStorage, FileSystemStorage>();
             services.AddTransient<IFileService, Core.Services.FileService>();
             services.AddTransient<IConversionService, ConversionService>();
-            services.AddEntityFrameworkNpgsql().AddDbContext<FileServiceContext>()
-                .BuildServiceProvider();
+
+            services.AddDbContext<FileServiceContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
 
 
             services.AddHostedService<RabbitConsumer>();
@@ -62,7 +57,7 @@ namespace SVH.FileService.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
 
@@ -77,7 +72,12 @@ namespace SVH.FileService.Host
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                // Mapping of endpoints goes here:
+                endpoints.MapControllers();
+            });
             
             FFmpeg.GetLatestVersion();
             if (Path.IsPathFullyQualified("C:\\Windows"))

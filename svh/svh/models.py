@@ -39,7 +39,6 @@ class VideoFolder(MPTTModel):
     path = models.CharField(max_length=2000, unique=True)
     type = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    preview_path = models.CharField(max_length=2000, null=True, blank=True)
     parent = TreeForeignKey('self',
                             related_name='folder_parent',
                             null=True, on_delete=models.DO_NOTHING, blank=True)
@@ -59,12 +58,6 @@ class VideoFolder(MPTTModel):
     @property
     def first_video(self):
         return self.videosource_set.first()
-
-    def fill(self, yaml_dict: dict):
-        self.description = yaml_dict.get('description')
-        self.preview_path = yaml_dict.get('preview_path')
-        self.type = yaml_dict.get('type')
-        self._name = yaml_dict.get('name')
 
     @property
     def preview(self):

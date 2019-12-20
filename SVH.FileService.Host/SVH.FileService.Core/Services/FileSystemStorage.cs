@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -25,6 +24,7 @@ namespace SVH.FileService.Core.Services
         public async Task<ICollection<string>> ScanBucket(string relativePath)
         {
             var path = Path.Combine(_root, relativePath);
+            Directory.CreateDirectory(path); // if not exists
             List<string> result = _fileSystem.Directory.EnumerateFiles(path).ToList();
             foreach (var directory in _fileSystem.Directory.EnumerateDirectories(path))
             {
@@ -58,7 +58,7 @@ namespace SVH.FileService.Core.Services
             return Task.CompletedTask;
         }
 
-        public Task<string> GetFilePath(string fileName)
+        public Task<string> GetFullFilePath(string fileName)
         {
             return Task.FromResult(Path.Combine(_root, fileName));
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using SVH.FileService.Core.Enums;
-using SVH.FileService.Core.Models;
+using SVH.FileService.Common.Enums;
 
 namespace SVH.FileService.Core.Services.Contracts
 {

@@ -1,6 +1,15 @@
 version: '3.3'
 
 services:
+  #cold start - volumes access initialization
+  volumes-provisioner:
+    image: alpine
+    entrypoint: /bin/sh -c "chown 33:33 -R /www/svh/"
+    volumes:
+      - media:/www/svh/media/
+      - static:/www/svh/static/
+      - settings:/www/svh/svh/settings_local/
+    network_mode: none
 
 # Proxypass nginx server
   nginx:
@@ -16,7 +25,6 @@ services:
     restart: always
     ports:
       - 80:80
-#    command: [nginx-debug, '-g', 'daemon off;']
 
 
 # Python web server
@@ -91,8 +99,9 @@ services:
     volumes:
     - media:/www/svh/media/
     environment:
-        DatabaseSettings__ConnectionString: Host=postgres;Port=5432;Database=svhFiles;Username=svh;
+        ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=svhFilesDocker;Username=svh;
         RabbitSettings__Host: rabbit
+        FileServiceSettings__MediaPath: /www/svh/media
     depends_on:
     - postgres
     links:

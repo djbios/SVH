@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SVH.FileService.Core.Enums;
 using SVH.FileService.Core.Rabbit;
 using SVH.FileService.Core.Rabbit.Messages;
 using SVH.FileService.Core.Services.Contracts;
@@ -15,6 +14,7 @@ using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
+using SVH.FileService.Common.Enums;
 using SVH.FileService.Core.Configuration;
 using Xabe.FFmpeg.Enums;
 using Xabe.FFmpeg.Exceptions;
@@ -38,45 +38,79 @@ namespace SVH.FileService.Core.Services
 
         public async Task ConvertInFormat(Guid videoFileId, VideoFormat format)
         {
-            Guid newFileId;
-            if (format == VideoFormat.preview)
-                newFileId = await GenerateFilePreview(videoFileId);
+            FileDbModel result;
 
-            else if (format == VideoFormat.gif)
-                newFileId = await GenerateFileGif(videoFileId);
+            var conversion =
+                await _context.Conversions.FirstOrDefaultAsync(c =>
+                    c.Source.FileId == videoFileId && c.VideoFormat == format);
+            
+            if (conversion?.Status == ConversionStatus.InProgress)
+                return;
+
+            if (conversion?.Status == ConversionStatus.Success)
+                result = conversion.Result;
 
             else
             {
                 var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
                            ?? throw new FileNotFoundException();
-                var path = await _storage.GetFilePath(file.FileName);
-                var newFilePath =
-                    await _storage.GeneratePath($"{videoFileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}_{format}.mp4");
-                IMediaInfo mediaInfo = await MediaInfo.Get(path);
-                IStream videoStream = mediaInfo.VideoStreams.FirstOrDefault().SetFormat(format);
 
-                await Conversion.New().AddStream(videoStream)
-                    .SetOutput(newFilePath)
-                    .Start();
+                if (conversion == null)
+                {
+                    conversion = new ConversionDbModel
+                    {
+                        Source = file,
+                        Status = ConversionStatus.InProgress,
+                        Tryes = 1,
+                        VideoFormat = format
+                    };
+                    _context.Add(conversion);
+                }
+                else
+                    conversion.Tryes++; //todo maxTryes
 
-                var newFile = _context.Files.Add(new FileDbModel(newFilePath));
                 await _context.SaveChangesAsync();
-                newFileId = newFile.Entity.FileId;
+
+                if (format == VideoFormat.preview)
+                    result = await GenerateFilePreview(file);
+
+                else if (format == VideoFormat.gif)
+                    result = await GenerateFileGif(file);
+
+                else
+                    result = await ConvertVideoInternal(file, format);
+
+                _context.Files.Add(result);
+                _context.SaveChanges();
             }
 
             _rabbitPublisher.Publish<VideoConvertedEventMessage>(new VideoConvertedEventMessage
             {
                 Format = format,
                 SourceId = videoFileId,
-                ResultId = newFileId
+                ResultId = result.FileId
             });
         }
 
-        private async Task<Guid> GenerateFilePreview(Guid videoFileId)
+        private async Task<FileDbModel> ConvertVideoInternal(FileDbModel file, VideoFormat format)
         {
-            var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
-                       ?? throw new FileNotFoundException();
-            var path = await _storage.GetFilePath(file.FileName);
+            var path = await _storage.GetFullFilePath(file.FileName);
+            var newFilePath =
+                await _storage.GeneratePath(
+                    $"{file.FileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}_{format}.mp4");
+            IMediaInfo mediaInfo = await MediaInfo.Get(path);
+            IStream videoStream = mediaInfo.VideoStreams.FirstOrDefault().SetFormat(format);
+
+            await Conversion.New().AddStream(videoStream)
+                .SetOutput(newFilePath)
+                .Start();
+
+            return new FileDbModel(newFilePath);
+        }
+
+        private async Task<FileDbModel> GenerateFilePreview(FileDbModel file)
+        {
+            var path = await _storage.GetFullFilePath(file.FileName);
             var previewPath = await _storage.GeneratePath($"{file.FileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}.jpg");
 
             IMediaInfo mediaInfo = await MediaInfo.Get(path);
@@ -96,34 +130,29 @@ namespace SVH.FileService.Core.Services
                             .SetSeek(TimeSpan.FromSeconds(targetSec)))
                         .SetOutput(previewPath)
                         .Start();
+
+                    if (GetAverageColor(previewPath) > 30) 
+                        break;
+
+                    _storage.RemoveFile(previewPath);
                 }
                 catch (ConversionException e)
                 {
                     Console.WriteLine(e);
                 }
-
-                if (GetAverageColor(previewPath) > 30) 
-                    break;
-                _storage.RemoveFile(previewPath);
             }
 
-            var result = _context.Files.Add(new FileDbModel(previewPath));
-            await _context.SaveChangesAsync();
-            return result.Entity.FileId;
+            return new FileDbModel(previewPath);
         }
 
-        private async Task<Guid> GenerateFileGif(Guid videoFileId)
+        private async Task<FileDbModel> GenerateFileGif(FileDbModel file)
         {
-            var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == videoFileId)
-                       ?? throw new FileNotFoundException();
-            var path = await _storage.GetFilePath(file.FileName);
+            var path = await _storage.GetFullFilePath(file.FileName);
             var previewPath = await _storage.GeneratePath($"{file.FileId}_{DateTimeOffset.Now.ToUnixTimeSeconds()}.gif");
 
             await Conversion.ToGif(path, previewPath, 0).Start();
 
-            var result = _context.Files.Add(new FileDbModel(previewPath));
-            await _context.SaveChangesAsync();
-            return result.Entity.FileId;
+            return new FileDbModel(previewPath);
         }
 
         private int GetAverageColor(string path)

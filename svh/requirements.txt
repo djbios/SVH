@@ -1,5 +1,5 @@
 requests
-django
+django < 3
 uwsgi
 ipython
 psycopg2-binary
@@ -13,3 +13,5 @@ pyyaml
 qbittorrent-api
 ffmpeg-python
 pika
+djangorestframework
+django-rest-swagger
