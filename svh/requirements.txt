@@ -1,10 +1,10 @@
+requests
 django
 uwsgi
 ipython
 psycopg2-binary
 imohash
 pillow
-opencv-python
 factory_boy
 django-mptt
 celery
@@ -12,3 +12,4 @@ moviepy
 pyyaml
 qbittorrent-api
 ffmpeg-python
+pika

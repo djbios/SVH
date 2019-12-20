@@ -59,7 +59,7 @@
                 <a class="card-with-href" href="{% url 'page' folder.id %}">
                     <div class="card" style="width: 18rem;">
                         <img alt="{{ folder.name }}" class="with-gif card-img-top"
-                             src="{{ folder.preview.image.url }}"/> <br/>
+                             src="{{ folder.preview.url }}"/> <br/>
                         <div class="card-body">
                             <h5 class="card-title">{{ folder.name }}</h5>
                             <p class="card-text">{{ folder.description }}</p>
@@ -81,7 +81,7 @@
             {% for video in videosources %}
                 <li class="list-group-item {% if not video.published %}disabled-li{% endif %}">
                     <img alt="{{ video.name }}" class="with-gif" data-alt-src="{{ video.gif_url }}"
-                         src="{{ video.preview.image.url }}"/> <br/>
+                         src="{{ video.preview.url }}"/> <br/>
                     <a href="{% url 'play_video' video.id %}">{{ video.name }}</a><br>
                 </li>
             {% endfor %}

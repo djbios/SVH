@@ -82,6 +82,24 @@ services:
       - 127.0.0.1:8080:8080
       - 6881:6881
       - 6881:6881/udp
+      
+# File service
+  fileservice:
+    build:
+      context: ../
+      dockerfile: docker/fileservice/Dockerfile
+    volumes:
+    - media:/www/svh/media/
+    environment:
+        DatabaseSettings__ConnectionString: Host=postgres;Port=5432;Database=svhFiles;Username=svh;
+        RabbitSettings__Host: rabbit
+    depends_on:
+    - postgres
+    links:
+    - postgres
+    restart: always
+    ports:
+    - 127.0.0.1:5000:80
 
 volumes:
   db_data: {}

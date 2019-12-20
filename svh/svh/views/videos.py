@@ -1,4 +1,3 @@
-from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 from svh.forms import AddFolderForm
@@ -26,6 +25,7 @@ def page_from(request, root):
     children = root_folder.get_children()
 
     videos = root_folder.videosource_set.order_by()
+
     if not request.user.is_staff:
         children = children.filter(published=True).order_by('_name')
         videos = videos.filter(published=True).order_by('_name')

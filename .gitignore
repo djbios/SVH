@@ -108,3 +108,10 @@ settings_local.py
 **/media
 **/.vs
 *DotSettings.*
+
+#NetCore
+bin/
+obj/
+*.tmp
+*.TMP
+*.exe

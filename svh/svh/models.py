@@ -3,10 +3,7 @@ from django.db import models
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 import os
-
-VIDEO_FORMATS = (
-    ('default', '-vcodec libx264'),
-)
+from svh.fileservice.proxy import get_file_url, start_conversion
 
 BIRTH_PLACES = ('user', 'torrent', 'upload')
 
@@ -20,6 +17,19 @@ class VideoFolderManager(models.Manager):
 
     def all_with_deleted(self, **kwargs):
         return super(VideoFolderManager, self).get_queryset().all()
+
+    def get_or_create_with_hierarchy(self, folderPath, save=True):
+        folder = self.get_queryset().filter(path=folderPath).first()
+        if folder is None:
+            folder = VideoFolder(path=folderPath)
+            if folderPath is not '':
+                parent_path = os.path.dirname(folderPath)
+                parent = self.get_or_create_with_hierarchy(parent_path)
+                parent.save()
+                folder.parent=parent
+            folder.save()
+
+        return folder
 
 
 class VideoFolder(MPTTModel):
@@ -43,7 +53,7 @@ class VideoFolder(MPTTModel):
     @property
     def name(self):
         if self._name == None:
-            return os.path.splitext(self.path)[0].replace(settings.SOURCE_VIDEOS_PATH,'')[1:]
+            return os.path.splitext(self.path)[0].replace(settings.SOURCE_VIDEOS_PATH,'')
         return self._name
 
     @property
@@ -97,51 +107,53 @@ class VideoSource(models.Model):
     @property
     def videofile(self):
         if settings.ALLOW_SOURCE_SERVING and not self.videofile_set.exists():
-            vf = VideoFile(path=self.path, format='default', source=self)
+            vf = VideoFile(format='default', source=self, fileId=self.hash)
             return vf
         return self.videofile_set.first()
 
     @property
     def preview(self):
-        return self.videofile.preview
+        preview = self.preview_set.first()
+        return preview or start_conversion(self.hash, 'preview')
 
     @property
     def gif_url(self):
-        from svh.tasks import generate_gif_task
         if hasattr(self, 'gif'):
-            return self.gif.image.url
+            return self.gif.url
         else:
-            generate_gif_task.delay(self.id)
+            start_conversion(self.hash, 'gif')
             if self.preview:
-                return self.preview.image.url
+                return self.preview.url
             else:
                 return None  # todo if no preview - return default img
 
 
-class VideoFile(models.Model): # todo deletion logic
-    path = models.CharField(max_length=2000, unique=True)
-    sizeBytes = models.IntegerField(null=True)
-    format = models.CharField(max_length=200, choices=VIDEO_FORMATS, default=VIDEO_FORMATS[0])
+class VideoFile(models.Model):
+    fileId = models.CharField(max_length=2000, unique=True)
+    format = models.CharField(max_length=200)
     source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.source.path + self.format
 
     @property
-    def preview(self):
-        return self.source.preview_set.first()
-
-    @property
     def url(self):
-        return self.path.replace(settings.MEDIA_ROOT,settings.MEDIA_URL)
+        return get_file_url(self.fileId)
 
 
 class Preview(models.Model): # todo delete file on model deletion
     videosource = models.ForeignKey(VideoSource, on_delete=models.CASCADE)
-    pos_seconds = models.IntegerField(null=True)
-    image = models.ImageField(upload_to='previews')
+    fileId = models.CharField(max_length=2000, unique=False)
+
+    @property
+    def url(self):
+        return get_file_url(self.fileId)
 
 
 class Gif(models.Model): # todo delete file on model deletion
     videosource = models.OneToOneField(VideoSource, on_delete=models.CASCADE)
-    image = models.FileField(upload_to='gifs')
+    fileId = models.CharField(max_length=2000, unique=True)
+
+    @property
+    def url(self):
+        return get_file_url(self.fileId)
