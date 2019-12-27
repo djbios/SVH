@@ -22,10 +22,10 @@ jobs:
           command: |
             mkdir ./backend/svh/settings_local/
             touch ./backend/svh/settings_local/__init__.py
-            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
+            sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./backend/svh/settings.py
       - run:
           command: |
-            python ./svh/manage.py test ./svh
+            python ./backend/manage.py test
   deploy:
     machine:
       enabled: true
