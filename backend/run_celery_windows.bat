@@ -1,0 +1,1 @@
+celery worker -A svh -l info -P eventlet

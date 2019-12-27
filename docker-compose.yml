@@ -1,0 +1,90 @@
+version: '3.3'
+
+services:
+# Proxypass nginx server
+  nginx:
+    build:
+      context: nginx
+    volumes:
+      - media:/www/svh/media/
+      - static:/www/svh/static
+    links:
+      - uwsgi
+    ports:
+      - 80:80
+
+
+# Python web server
+  uwsgi:
+    build:
+      context: backend
+    volumes:
+    - settings:/www/svh/svh/settings_local/
+    - media:/www/svh/media/
+    - static:/www/svh/static
+    depends_on:
+    - postgres
+    links:
+    - postgres
+    ports:
+    - 127.0.0.1:9001:9000
+
+
+# Celery for long running background tasks
+  celery:
+    build:
+      context: backend
+      dockerfile: celery.Dockerfile
+    volumes:
+      - settings:/www/svh/svh/settings_local/
+      - media:/www/svh/media/
+    depends_on:
+      - postgres
+    links:
+      - postgres
+
+
+# PostgreSQL database
+  postgres:
+    build:
+      context: postgres
+    volumes:
+    - db_data:/var/lib/postgresql/data/
+    ports:
+      - 127.0.0.1:5432:5432
+
+# RabbitMQ
+  rabbit:
+    image: rabbitmq
+    volumes:
+      - rabbit:/var/lib/rabbitmq
+    ports:
+      - 127.0.0.1:5672:5672
+
+# File service
+  fileservice:
+    build:
+      context: ./fileservice
+    volumes:
+    - media:/www/svh/media/
+    environment:
+        ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=svhFilesDocker;Username=svh;
+        RabbitSettings__Host: rabbit
+        FileServiceSettings__MediaPath: /www/svh/media
+    depends_on:
+    - postgres
+    ports:
+    - 127.0.0.1:5001:80
+
+volumes:
+  db_data: {}
+  media:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${MEDIA_PATH}
+      o: bind
+  settings: {}
+  rabbit: {}
+  static: {}
+  torrents: {}

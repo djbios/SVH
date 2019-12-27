@@ -17,11 +17,11 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           command: |
-            sudo pip install -r ./svh/requirements.txt
+            sudo pip install -r ./backend/requirements.txt
       - run:
           command: |
-            mkdir ./svh/svh/settings_local/
-            touch ./svh/svh/settings_local/__init__.py
+            mkdir ./backend/svh/settings_local/
+            touch ./backend/svh/settings_local/__init__.py
             sed -i "s/'HOST': 'postgres'/'HOST': 'localhost'/g" ./svh/svh/settings.py
       - run:
           command: |
@@ -33,7 +33,7 @@ jobs:
       - add_ssh_keys
       - run:
           command: |
-            ssh $SSH_USER@$SSH_HOST 'export MEDIA_PATH='"'$MEDIA_PATH'"'; cd ./SVH && git pull origin master && git checkout -f $CIRCLE_SHA1 && ./docker/deploy.sh'
+            ssh $SSH_USER@$SSH_HOST 'export MEDIA_PATH='"'$MEDIA_PATH'"'; cd ./SVH && git pull origin master && git checkout -f $CIRCLE_SHA1 && ./deploy.sh'
 
 workflows:
   version: 2

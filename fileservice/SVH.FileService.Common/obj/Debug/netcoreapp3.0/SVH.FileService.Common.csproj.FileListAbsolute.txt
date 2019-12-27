@@ -1,0 +1,8 @@
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\bin\Debug\netcoreapp3.0\SVH.FileService.Common.deps.json
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\bin\Debug\netcoreapp3.0\SVH.FileService.Common.dll
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\bin\Debug\netcoreapp3.0\SVH.FileService.Common.pdb
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\obj\Debug\netcoreapp3.0\SVH.FileService.Common.csprojAssemblyReference.cache
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\obj\Debug\netcoreapp3.0\SVH.FileService.Common.AssemblyInfoInputs.cache
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\obj\Debug\netcoreapp3.0\SVH.FileService.Common.AssemblyInfo.cs
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\obj\Debug\netcoreapp3.0\SVH.FileService.Common.dll
+C:\Users\dorofeev.andrey\Documents\SVH\SVH.FileService.Host\SVH.FileService.Common\obj\Debug\netcoreapp3.0\SVH.FileService.Common.pdb
