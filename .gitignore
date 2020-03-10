@@ -108,3 +108,6 @@ settings_local.py
 **/media
 **/.vs
 *DotSettings.*
+bin/
+.vscode/
+obj/

@@ -1,17 +1,11 @@
 requests
 django < 3
-uwsgi
 ipython
 psycopg2-binary
-imohash
-pillow
 factory_boy
 django-mptt
 celery
-moviepy
 pyyaml
-qbittorrent-api
-ffmpeg-python
 pika
 djangorestframework
 django-rest-swagger
