@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Framing;
 using SVH.FileService.Core.Configuration;
 using SVH.FileService.Core.Rabbit.Messages;
 
@@ -56,14 +55,10 @@ namespace SVH.FileService.Core.Rabbit
 
             var jsonMessage = JsonConvert.SerializeObject(message);
             var bytesMessage = Encoding.UTF8.GetBytes(jsonMessage);
+            var model = _connection.CreateModel();
+            var props = model.CreateBasicProperties();
 
-            var props = new BasicProperties
-            {
-                Headers = new Dictionary<string, object>
-                {
-                    { AppConstants.RabbitMessageTypeHeaderName, typeof(T).Name }
-                }
-            };
+            props.Headers = new Dictionary<string, object> {{AppConstants.RabbitMessageTypeHeaderName, typeof(T).Name}};
             var endpoint = _settings.RabbitEndpoints[message.TargetEndpoint];
             _channel.BasicPublish(endpoint.Exchange, endpoint.RoutingKey, props, bytesMessage);
             _logger.LogInformation($"Message sent {jsonMessage}");

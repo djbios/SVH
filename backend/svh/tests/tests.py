@@ -156,6 +156,6 @@ class CoreTests(TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
-        for vs in VideoSource.objects.all():
+        for vs in VideoFile.objects.all():
             self.assertNotIn(find, vs.name)
             self.assertIn(replace, vs.name)

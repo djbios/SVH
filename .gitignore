@@ -111,3 +111,6 @@ settings_local.py
 bin/
 .vscode/
 obj/
+fileservice/static/
+ffmpeg
+ffprobe

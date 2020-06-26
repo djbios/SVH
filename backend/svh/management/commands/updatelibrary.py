@@ -6,4 +6,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         from svh.tasks import update_library
-        update_library.delay()
+        update_library()

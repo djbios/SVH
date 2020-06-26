@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render
 import re
 
 from svh.forms import RenameForm
-from svh.models import VideoSource
+from svh.models import VideoFile
 
 
 @staff_member_required
@@ -12,7 +12,7 @@ def regex_rename_sources(request):
     ids = request.GET.get('ids') or request.POST.get('ids')
     if not ids:
         return HttpResponseBadRequest()
-    vs_list = [get_object_or_404(VideoSource, id=i) for i in ids.split(',')]
+    vs_list = [get_object_or_404(VideoFile, id=i) for i in ids.split(',')]
 
     if request.method == 'POST':
         form = RenameForm(request.POST)

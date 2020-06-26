@@ -9,7 +9,6 @@ using SVH.FileService.Core.Services.Contracts;
 using SVH.FileService.Database;
 using SVH.FileService.Database.Models;
 using Xabe.FFmpeg;
-using Xabe.FFmpeg.Streams;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
@@ -18,6 +17,7 @@ using SVH.FileService.Common.Enums;
 using SVH.FileService.Core.Configuration;
 using Xabe.FFmpeg.Enums;
 using Xabe.FFmpeg.Exceptions;
+using Xabe.FFmpeg.Streams;
 
 namespace SVH.FileService.Core.Services
 {

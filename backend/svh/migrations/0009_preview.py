@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('pos_seconds', models.IntegerField(null=True)),
                 ('image', models.ImageField(upload_to='')),
-                ('videofile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='svh.VideoSource')),
+                ('videofile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='svh.VideoFile')),
             ],
         ),
     ]

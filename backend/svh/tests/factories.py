@@ -1,5 +1,5 @@
 import factory.fuzzy
-from svh.models import VideoFolder, VideoSource, VideoFile, Preview
+from svh.models import VideoFolder, VideoFile, VideoFile, Preview
 from django.contrib.auth.models import User
 
 
@@ -16,7 +16,7 @@ class VideoFolderFactory(factory.DjangoModelFactory):
 
 class VideoSourceFactory(factory.DjangoModelFactory):
     class Meta:
-        model = VideoSource
+        model = VideoFile
 
     _name = factory.Faker('name')
     path = factory.Faker('file_path')

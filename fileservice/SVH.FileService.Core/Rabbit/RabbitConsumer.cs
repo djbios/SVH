@@ -90,7 +90,7 @@ namespace SVH.FileService.Core.Rabbit
 
         private MessageBase GetMessageObject(BasicDeliverEventArgs ea)
         {
-            var content = System.Text.Encoding.UTF8.GetString(ea.Body);
+            var content = System.Text.Encoding.UTF8.GetString(ea.Body.ToArray());
             _logger.LogInformation($"consumer received {content}");
 
             var typeHeaderExists =

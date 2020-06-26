@@ -7,9 +7,9 @@ from mptt.admin import DraggableMPTTAdmin
 from svh.rabbit.messages import send_message, VideoConvertTaskMessage
 
 
-class VideoSourceAdmin(admin.ModelAdmin):
-    ordering = ['path']
-    search_fields = ['path', '_name']
+class VideoFileAdmin(admin.ModelAdmin):
+    ordering = ['id']
+    search_fields = ['name']
 
     def make_published(self, request, queryset):
         queryset.update(published=True)
@@ -29,8 +29,7 @@ class VideoSourceAdmin(admin.ModelAdmin):
     actions = [make_published, convert_in_default_format, regex_rename]
 
 
-admin.site.register(VideoSource, VideoSourceAdmin)
+admin.site.register(VideoFile, VideoFileAdmin)
 admin.site.register(VideoFolder, DraggableMPTTAdmin)
 admin.site.register(Gif)
 admin.site.register(Preview)
-admin.site.register(VideoFile)

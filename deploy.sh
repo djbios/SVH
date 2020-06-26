@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # On clean machine install:
 # sudo apt install git
 # curl -fsSL https://get.docker.com -o get-docker.sh

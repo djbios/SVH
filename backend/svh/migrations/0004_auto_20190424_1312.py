@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='videofile',
             name='source',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='svh.VideoSource'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='svh.VideoFile'),
         ),
     ]

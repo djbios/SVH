@@ -1,7 +1,7 @@
 from django.conf import settings
 import os
 from django.dispatch import receiver
-from svh.models import VideoSource, VideoFile, VideoFolder, Preview, Gif
+from svh.models import VideoFile, VideoFile, VideoFolder, Preview, Gif
 from svh.rabbit.signals import synchronized_signal, video_converted_signal
 from svh.utils import log_exception
 from svh.celery import app
@@ -11,12 +11,12 @@ VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'a
 
 
 @receiver(synchronized_signal)
-def update_library(sender, **kwargs):
+def update_library(**kwargs):
     folder_traverser_fileservice()
 
 
 def folder_traverser_fileservice():
-    from svh.fileservice.proxy import get_files
+    from fileservice.proxy import get_files
     for f in get_files():
         filepath = f.get('fileName').replace(settings.FILESERVICE_SOURCES_FOLDER, '')
         dirpath = os.path.dirname(filepath)
@@ -25,18 +25,15 @@ def folder_traverser_fileservice():
         if os.path.splitext(filepath)[1] in ['.%s' % ex for ex in
                                       VIDEO_EXTENSIONS + [ext.upper() for ext in VIDEO_EXTENSIONS]]:
             hash = f.get('fileId')
-            vs = None
             try:
-                vs = VideoSource.objects.get_with_deleted(hash=hash)
-                vs.deleted = False
-                vs.path = filepath
-                vs.folder = folder
-                vs.save()
-            except VideoSource.DoesNotExist:
-                vs = VideoSource(path=filepath, hash=hash, folder=folder)
-                vs.save()
-            vf = VideoFile(source=vs, fileId=f.get('FileId'), format='source')
-            vf.save()
+                vf = VideoFile.objects.get_with_deleted(hash=hash)
+                vf.deleted = False
+                vf.path = filepath
+                vf.folder = folder
+                vf.save()
+            except VideoFile.DoesNotExist:
+                vf = VideoFile(hash=hash, folder=folder)
+                vf.save()
             print(filepath, hash)
 
 
@@ -56,8 +53,8 @@ def check_torrents():
 
 @receiver(video_converted_signal)
 def handle_converted_message(sender, source_file_id, result_file_id, format, **kwargs):
-    VideoSource.objects.filter(videofile__fileId=source_file_id).first()
-    source = VideoSource.objects.filter(videofile__fileId=source_file_id) or VideoSource.objects.get(hash=source_file_id)
+    VideoFile.objects.filter(videofile__fileId=source_file_id).first()
+    source = VideoFile.objects.filter(videofile__fileId=source_file_id) or VideoFile.objects.get(hash=source_file_id)
     print(format)
     if format == 'preview':
         pr = Preview(videosource=source, fileId=result_file_id)

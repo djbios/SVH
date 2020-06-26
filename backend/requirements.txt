@@ -9,3 +9,6 @@ pyyaml
 pika
 djangorestframework
 django-rest-swagger
+qbittorrent-api
+markdown
+django-filter

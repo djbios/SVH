@@ -1,9 +1,9 @@
-from django.conf import settings
 from django.db import models
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 import os
-from svh.fileservice.proxy import get_file_url, start_conversion
+
+from fileservice.proxy import start_conversion, get_file_url
 
 BIRTH_PLACES = ('user', 'torrent', 'upload')
 
@@ -34,11 +34,11 @@ class VideoFolderManager(models.Manager):
 
 class VideoFolder(MPTTModel):
     class Meta:
-        ordering = ('path',)
-    _name = models.CharField(max_length=500, null=True, db_column='name', blank=True)
-    path = models.CharField(max_length=2000, unique=True)
+        ordering = ('name',)
+    name = models.CharField(max_length=500, null=False, blank=False)
     type = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    path = models.CharField(max_length=10000, null=True)
     parent = TreeForeignKey('self',
                             related_name='folder_parent',
                             null=True, on_delete=models.DO_NOTHING, blank=True)
@@ -50,43 +50,33 @@ class VideoFolder(MPTTModel):
         return self.name
 
     @property
-    def name(self):
-        if self._name == None:
-            return os.path.splitext(self.path)[0].replace(settings.SOURCE_VIDEOS_PATH,'')
-        return self._name
-
-    @property
-    def first_video(self):
-        return self.videosource_set.first()
-
-    @property
     def preview(self):
-        sources = self.videosource_set.exclude(preview=None)
+        sources = self.videofile_set.exclude(preview=None)
         if not sources.exists():
-            sources = VideoSource.objects.filter(folder__in=self.get_descendants()).exclude(preview=None)
+            sources = VideoFile.objects.filter(folder__in=self.get_descendants()).exclude(preview=None)
         return sources.first().preview if sources.exists() else None
 
 
-class VideoSourceManager(models.Manager):
+class VideoFileManager(models.Manager):
     def get_queryset(self):
-        return super(VideoSourceManager, self).get_queryset().exclude(deleted=True)
+        return super(VideoFileManager, self).get_queryset().exclude(deleted=True)
 
     def get_with_deleted(self, **kwargs):
-        return super(VideoSourceManager, self).get_queryset().get(**kwargs)
+        return super(VideoFileManager, self).get_queryset().get(**kwargs)
 
     def all_with_deleted(self, **kwargs):
-        return super(VideoSourceManager, self).get_queryset().all()
+        return super(VideoFileManager, self).get_queryset().all()
 
 
-class VideoSource(models.Model):
-    _name = models.CharField(max_length=500, null=True, db_column='name')
-    path = models.CharField(max_length=2000,  unique=True)
-    hash = models.CharField(max_length=200, unique=True)
-    sizeBytes = models.IntegerField(null=True)
-    deleted = models.BooleanField(default=False)
+class VideoFile(models.Model):
     folder = models.ForeignKey(VideoFolder,on_delete=models.SET_NULL, null=True)
-    objects = VideoSourceManager()
+    _name = models.CharField(max_length=500, null=True, db_column='name')
+    hash = models.CharField(max_length=200, unique=True)
+    deleted = models.BooleanField(default=False)
+    objects = VideoFileManager()
     published = models.BooleanField(default=False)
+    sourceHash = models.CharField(max_length=255, null=True)
+    format = models.CharField(max_length=255, default='source')
 
     def __str__(self):
         return self.name
@@ -94,15 +84,8 @@ class VideoSource(models.Model):
     @property
     def name(self):
         if self._name == None:
-            return os.path.splitext(os.path.basename(self.path))[0]
+            return f'{os.path.splitext(os.path.basename(self.folder.path))[0]}/{self.hash}'
         return self._name
-
-    @property
-    def videofile(self):
-        if settings.ALLOW_SOURCE_SERVING and not self.videofile_set.exists():
-            vf = VideoFile(format='default', source=self, fileId=self.hash)
-            return vf
-        return self.videofile_set.first()
 
     @property
     def preview(self):
@@ -120,22 +103,8 @@ class VideoSource(models.Model):
             else:
                 return None  # todo if no preview - return default img
 
-
-class VideoFile(models.Model):
-    fileId = models.CharField(max_length=2000, unique=True)
-    format = models.CharField(max_length=200)
-    source = models.ForeignKey(VideoSource, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.source.path + self.format
-
-    @property
-    def url(self):
-        return get_file_url(self.fileId)
-
-
 class Preview(models.Model): # todo delete file on model deletion
-    videosource = models.ForeignKey(VideoSource, on_delete=models.CASCADE)
+    videosource = models.ForeignKey(VideoFile, on_delete=models.CASCADE)
     fileId = models.CharField(max_length=2000, unique=False)
 
     @property
@@ -144,7 +113,7 @@ class Preview(models.Model): # todo delete file on model deletion
 
 
 class Gif(models.Model): # todo delete file on model deletion
-    videosource = models.OneToOneField(VideoSource, on_delete=models.CASCADE)
+    videosource = models.OneToOneField(VideoFile, on_delete=models.CASCADE)
     fileId = models.CharField(max_length=2000, unique=True)
 
     @property
