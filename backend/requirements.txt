@@ -12,3 +12,4 @@ django-rest-swagger
 qbittorrent-api
 markdown
 django-filter
+django_cors_headers

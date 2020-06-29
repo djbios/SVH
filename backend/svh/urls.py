@@ -5,14 +5,14 @@ from django.contrib import admin
 from rest_framework_swagger.views import get_swagger_view
 from rest_framework import routers
 
-from svh.views import video_views
+from svh.views import views
 from svh.views.api import update_library_cmd, is_superuser
 from svh.views.admin import regex_rename_sources, regex_ajax
 
 schema_view = get_swagger_view(title='SVH API')
 router = routers.DefaultRouter()
-router.register(r'videofolder', video_views.VideoFolderViewSet)
-router.register(r'videofile', video_views.VideoFileViewSet)
+router.register(r'videofolder', views.VideoFolderViewSet)
+router.register(r'videofile', views.VideoFileViewSet)
 
 urlpatterns = [url(r'^updatelibrary/$', update_library_cmd, name='update_library'),
                url(r'^superuser/$', is_superuser, name='superuser'),

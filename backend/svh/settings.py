@@ -26,6 +26,7 @@ DEBUG = env_or_def('DEBUG', True)
 
 ALLOWED_HOSTS = env_or_def('ALLOWED_HOSTS', '*')
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'svh.urls'
@@ -163,6 +165,6 @@ RABBIT_SETTINGS = {
   }
 
 REST_FRAMEWORK = {
-
-'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }

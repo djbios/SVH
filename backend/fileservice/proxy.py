@@ -1,6 +1,5 @@
 import requests
 from django.conf import settings
-from svh.celery import app
 from svh.rabbit.messages import send_message, VideoConvertTaskMessage
 
 
